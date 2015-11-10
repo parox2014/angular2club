@@ -1,0 +1,20 @@
+{
+  "name": "angular2club",
+  "version": "1.0.0",
+  "description": "'an angular2 club of china'",
+  "main": "server.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "rep"
+  },
+  "keywords": [
+    "'angular2",
+    "club",
+    "nodejs'"
+  ],
+  "author": "'William Du'",
+  "license": "MIT"
+}
