@@ -1,20 +1,39 @@
 {
-  "name": "angular2club",
-  "version": "1.0.0",
-  "description": "'an angular2 club of china'",
-  "main": "server.js",
-  "scripts": {
-    "test": "test"
-  },
-  "repository": {
-    "type": "git",
-    "url": "rep"
-  },
-  "keywords": [
-    "'angular2",
+    "name": "angular2club",
+    "version": "1.0.0",
+    "description": "'an angular2 club of china'",
+    "main": "server.js",
+    "scripts": {
+        "test": "test"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/WilliamDu1981/angular2club.git"
+    },
+    "keywords": [
+    "angular2",
     "club",
-    "nodejs'"
-  ],
-  "author": "'William Du'",
-  "license": "MIT"
+    "nodejs"
+    ],
+    "author": "'William Du'",
+    "license": "MIT",
+    "dependencies": {
+        "body-parser": "^1.13.3",
+        "connect-mongo": "^0.8.2",
+        "cookie-parser": "^1.3.5",
+        "ejs": "^2.3.3",
+        "express": "^4.13.3",
+        "express-session": "^1.11.3",
+        "express-validator": "^2.17.1",
+        "mongoose": "^4.1.5",
+        "nodemailer": "^1.5.0",
+        "redis": "^2.2.1",
+        "underscore": "^1.8.3",
+        "moment":"*"
+    },
+    "devDependencies": {
+        "should": "^7.1.0",
+        "mocha": "^2.3.3",
+        "supertest": "^1.1.0"
+    }
 }
