@@ -4,7 +4,7 @@ const config={
     HOST:'localhost',
     PORT:80,
     VIEW_ENGINE:'ejs',
-    DATABASE:'mongodb://angular2club:root@localhost/angular2club',
+    DATABASE:'mongodb://angular2club:parox606@localhost/angular2club',
     CDN:'',
     SITE_ICON:'',
     SITE_LOG:'',
