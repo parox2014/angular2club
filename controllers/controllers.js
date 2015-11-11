@@ -1,0 +1,1 @@
+exports.userCtrl=require('./user.controller');
