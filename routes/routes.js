@@ -10,4 +10,6 @@ module.exports=function(server){
     });
 
     server.get('/unique',controllers.userCtrl.unique);
+
+    server.post('/signup',controllers.userCtrl.signup)
 };

@@ -12,19 +12,17 @@ const util=require('../util/util');
  * @param res
  */
 exports.unique=function (req,res) {
-
-    var query={
-        account:req.params.account
-    };
-
-    User.unique(query)
+    User.unique(req.query)
         .then(function (isExist) {
             if(isExist){
                 var msg='ACCOUNT_IS_EXIST';
                 res.set('X-Error',msg);
                 res.status(403).send({msg:msg});
             }else{
-                res.send({msg:true});
+                res.json({
+                    result:true,
+                    msg:'ACCOUNT_IS_NOT_EXIST'
+                });
             }
         },function(err){
             res.status(403).send({msg:err});
@@ -33,13 +31,6 @@ exports.unique=function (req,res) {
 
 //帐号注册
 exports.signup=function(req,res){
-    var reqBody=req.body;
-
-    var account={
-        account:reqBody.account,
-        nickName:reqBody.nickName,
-        hashedPassword:hashPW(reqBody.password)
-    };
 
     //验证帐号是否合法
     req.checkBody('account','ACCOUNT_INCORRECT').notEmpty().isEmail();
@@ -58,30 +49,41 @@ exports.signup=function(req,res){
         return res.status(403).send(mapErrors);
     }
 
-    User.unique({account:account.account},function (isExist) {
-        //如果帐号已经存在,返回403错误
-        if(isExist){
-            return res.status(403).send({msg:'ACCOUNT_IS_EXIST'});
-        }
+    var reqBody=req.body;
 
-        //如果帐号不存在，则创建帐号
-        User.create(account,function(err,user){
-            if(err){
-                //如果创建帐号发生错误，返回500错误
-                return res.status(500).send({msg:err});
+    var account={
+        account:reqBody.account,
+        nickName:reqBody.nickName,
+        hashedPassword:util.hashPW(reqBody.password)
+    };
+
+    User.unique({account:account.account})
+        .then(function (isExist) {
+            //如果帐号已经存在,返回403错误
+            if(isExist){
+                return res.status(403).send({msg:'ACCOUNT_IS_EXIST'});
             }
 
-            //帐号创建成功后，发送激活邮件
-            mailService
-                .sendActiveMail(user)
-                .then(function (info) {
-                    console.log('Send Email Success',info.response);
-                },function (err) {
-                    console.error('Send Email Failed',err);
-                });
+            //如果帐号不存在，则创建帐号
+            User.create(account,function(err,user){
 
-            //返回用户信息
-            res.json(user);
+                console.log(user);
+                if(err){
+                    //如果创建帐号发生错误，返回500错误
+                    return res.status(500).send({msg:err});
+                }
+
+                //帐号创建成功后，发送激活邮件
+                /*mailService
+                 .sendActiveMail(user)
+                 .then(function (info) {
+                 console.log('Send Email Success',info.response);
+                 },function (err) {
+                 console.error('Send Email Failed',err);
+                 });*/
+
+                //返回用户信息
+                res.json(user);
+            });
         });
-    });
 };

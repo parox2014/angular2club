@@ -22,12 +22,10 @@ var db=mongoose.connect(config.DATABASE,function(err,e){
 
 var server=express();
 
-routes(server);
 
 server.set('view engine',config.VIEW_ENGINE);
 
 
-server.use(morgan('dev'));
 server.use(bodyParser.json());
 server.use(bodyParser.urlencoded({ extended: false }));
 
@@ -45,10 +43,12 @@ server.use(session({
     store:new MongoStore({ mongooseConnection: mongoose.connection })
 }));
 
+routes(server);
+
+server.use(morgan('dev'));
 
 // catch 404 and forward to error handler
 server.use(function(req, res, next) {
-    console.log('fuck');
     var err = new Error('Page Not Found');
     err.status = 404;
     next(err);
@@ -66,16 +66,17 @@ if (server.get('env') === 'development') {
             error: err
         });
     });
+
 }
 
 // 生产环境错误处理
-server.use(function(err, req, res, next) {
+/*server.use(function(err, req, res, next) {
     res.status(err.status || 500);
     res.render('error', {
         message: err.message,
         error: {}
     });
-});
+});*/
 
 server.listen(config.PORT,function(){
     console.log('server start success at port:'+config.PORT);
