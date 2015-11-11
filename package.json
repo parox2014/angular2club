@@ -25,11 +25,13 @@
     "express": "^4.13.3",
     "express-session": "^1.11.3",
     "express-validator": "^2.17.1",
+    "favicon": "0.0.2",
+    "moment": "*",
     "mongoose": "^4.1.5",
     "nodemailer": "^1.5.0",
     "redis": "^2.2.1",
-    "underscore": "^1.8.3",
-    "moment": "*"
+    "serve-favicon": "^2.3.0",
+    "underscore": "^1.8.3"
   },
   "devDependencies": {
     "mocha": "^2.3.3",
