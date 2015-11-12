@@ -43,9 +43,6 @@ var UserSchema=new Schema({
     }
 });
 
-UserSchema.statics.findUserByNickName=function (nickName) {
-    return this.find({ nickName: nickName });
-};
 
 UserSchema.statics.unique=function (query) {
     return new Promise((resolve,reject)=>{

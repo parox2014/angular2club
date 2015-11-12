@@ -1,10 +1,15 @@
 const path=require('path');
 
+const DB_NAME='angular2club';//数据库名
+const DB_USER='angular2club';//数据库用户名
+const DB_PWD='parox606';//数据库密码
+const DB_URL='localhost/';//数据库地址
+
 const config={
     HOST:'localhost',
     PORT:80,
     VIEW_ENGINE:'ejs',
-    DATABASE:'mongodb://angular2club:parox606@localhost/angular2club',
+    DATABASE:'mongodb://'+DB_USER+':'+DB_PWD+'@'+DB_URL+DB_NAME,
     CDN:'',
     SITE_ICON:'',
     SITE_LOG:'',

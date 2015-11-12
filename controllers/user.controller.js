@@ -67,7 +67,6 @@ exports.signup=function(req,res){
             //如果帐号不存在，则创建帐号
             User.create(account,function(err,user){
 
-                console.log(user);
                 if(err){
                     //如果创建帐号发生错误，返回500错误
                     return res.status(500).send({msg:err});
