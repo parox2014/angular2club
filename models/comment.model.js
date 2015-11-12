@@ -28,8 +28,7 @@ var CommentSchema=new Schema({
     vote:{
         type:Number,
         default:0
-    },
-    comments:[ObjectId]
+    }
 });
 
 CommentSchema.index({_id: 1});

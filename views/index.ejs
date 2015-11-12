@@ -5,6 +5,25 @@
 <h1 style="text-align: center;font-family: 'Microsoft Yahei';">网站正在开发中，敬请期待......</h1>
 <h3 style="text-align: center;font-family: 'Microsoft Yahei';">github项目地址：<a href="https://github.com/WilliamDu1981/angular2club">https://github.com/WilliamDu1981/angular2club</a> </h3>
 <h3 style="text-align: center;font-family: 'Microsoft Yahei';">qq群:<a href="http://jq.qq.com/?_wv=1027&k=fkBdwB">461460156</a> ,欢迎志趣相投的朋友加入！</h3>
+
+<ul>
+    <li>系统:<%=system%></li>
+    <li>平台:<%=platform%></li>
+    <li>内存:<%=(totalmem/1024/1024).toFixed(2)+'M'%></li>
+    <li>可用内存:<%=(freemem/1024/1024).toFixed(2)+'M'%></li>
+    <li>主机名:<%=hostName%></li>
+    <hr>
+    <h5>cpu</h5>
+    <%cpus.forEach(function(cpu){%>
+    <li>
+        <ul>
+            <li><%=cpu.model%></li>
+            <li><%=cpu.speed%></li>
+        </ul>
+
+    </li>
+    <%})%>
+</ul>
 <%include ./common/scripts.ejs%>
 </body>
 <%include ./common/footer.ejs%>

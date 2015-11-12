@@ -51,8 +51,7 @@ var TopicSchema=new Schema({
             type:Number,
             default:0
         }
-    },
-    comments:[ObjectId]
+    }
 });
 
 TopicSchema.index({createAt: -1});

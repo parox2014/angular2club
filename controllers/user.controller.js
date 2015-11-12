@@ -73,16 +73,36 @@ exports.signup=function(req,res){
                 }
 
                 //帐号创建成功后，发送激活邮件
-                /*mailService
+                mailService
                  .sendActiveMail(user)
                  .then(function (info) {
-                 console.log('Send Email Success',info.response);
+                    console.log('Send Email Success',info.response);
                  },function (err) {
-                 console.error('Send Email Failed',err);
-                 });*/
+                    console.error('Send Email Failed',err);
+                 });
 
                 //返回用户信息
                 res.json(user);
             });
         });
+};
+
+exports.active=function(req,res){
+    User.findById(req.params.id,function(err,user){
+        if(err){
+            return res.status(500)
+                    .send({
+                        result:false,
+                        msg:err
+                    });
+        }
+        if(user.get('isActive')){
+            return res.status(403).send({result:false,msg:'USER_IS_ACTIVED'})
+        }
+        user.set('isActive',true);
+
+        user.save(function(err,doc){
+            res.send({msg:'active user success',data:doc});
+        });
+    });
 };
