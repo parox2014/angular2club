@@ -27,6 +27,18 @@ const config={
     upload:{
         PATH:path.join('/upload/'),
         URL:'/upload/'
+    },
+    thirdPart:{
+        qq:{
+            APP_ID:101268680,
+            APP_KEY:'0bd1ac2e7948d03f0f75128239d71910'
+        },
+        weixin:{
+
+        },
+        weibo:{
+
+        }
     }
 };
 

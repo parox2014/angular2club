@@ -23,12 +23,30 @@ var UserSchema=new Schema({
         type:Boolean,
         default:false//帐号是否激活，默认未激活
     },
-    qq:Number,
+    score:{
+        type:Number,
+        default:0
+    },
+    postCount:{
+        type:Number,
+        default:0
+    },
+    commentCount:{
+        type:Number,
+        default:0
+    },
+    qq:String,
     weibo:String,
     weixin:String,
+    github:String,
+    googlePlus:String,
+    facebook:String,
+    twitter:String,
     avatar:String,
     gender:String,//male为男性,female为女性
     address:String,
+    website:String,
+    birthday:Date,
     createAt:{
         type:Date,
         default:Date.now
@@ -47,9 +65,6 @@ var UserSchema=new Schema({
 UserSchema.statics.unique=function (query) {
     return new Promise((resolve,reject)=>{
         this.findOne(query,function (err,doc) {
-                console.log(query);
-                console.log(doc);
-
                 if(err){
                     reject(err);
                 }else{
