@@ -30,6 +30,8 @@ module.exports=function(server){
     //用户资料更新
     userRouter.put('/',auth.signinRequired,controllers.userCtrl.update);
 
+    userRouter.get('/auth/qq',controllers.userCtrl.authQQ);
+
     server.use('/user',userRouter);
 
 

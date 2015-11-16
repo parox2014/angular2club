@@ -14,8 +14,7 @@ var UserSchema=new Schema({
         required:true
     },
     hashedPassword:{
-        type:String,
-        required:true
+        type:String
     },
     openId:String,
     description:String,

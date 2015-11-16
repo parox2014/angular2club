@@ -31,13 +31,19 @@ const config={
     thirdPart:{
         qq:{
             APP_ID:101268680,
-            APP_KEY:'0bd1ac2e7948d03f0f75128239d71910'
+            APP_KEY:'0bd1ac2e7948d03f0f75128239d71910',
+            CALLBACK_URI:'http://test.angular2.club/user/auth/qq',
+            HOST_NAME:'graph.qq.com',
+            PATH_ACCESS_TOKEN:'/oauth2.0/token?',
+            PATH_OPEN_ID:'/oauth2.0/me?',
+            PATH_GET_USER_INFO:'/user/get_user_info'
         },
         weixin:{
 
         },
         weibo:{
-
+            APP_ID:4126929706,
+            APP_KEY:'568324052c2ce439e5b7b7c4126d77e8'
         }
     }
 };

@@ -1,6 +1,7 @@
 'use strict';
 const SIGNIN_URL='/signin';
 
+
 exports.signinRequired=function (req,res,next) {
     if(req.session.user){
         next();
@@ -12,3 +13,5 @@ exports.signinRequired=function (req,res,next) {
 exports.adminRequired=function (req,res,next) {
     // body...
 };
+
+

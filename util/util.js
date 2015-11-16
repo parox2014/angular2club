@@ -3,3 +3,7 @@ const crypto=require('crypto');
 exports.hashPW=function(pass){
     return crypto.createHash('sha256').update(pass).digest('base64').toString();
 };
+exports.transformJSONPData=function(data){
+    data=data.replace(/^callback\(/,'');
+    return data.replace(');','');
+};

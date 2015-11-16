@@ -82,6 +82,8 @@ if (server.get('env') === 'development') {
     });
 });*/
 
+server.locals.config=config;
+
 server.listen(config.PORT,function(){
     console.log('server start success at port:'+config.PORT);
 });

@@ -4,7 +4,11 @@
 const User=require('../models/models').User;
 const mailService=require('../services/mail');
 const util=require('../util/util');
-
+const config=require('../config');
+const https=require('https');
+const querystring=require('querystring');
+const auth=require('../middlewares/auth');
+const userService=require('../services/user.service');
 /**
  * @description 验证用户帐号是否唯一
  * @param req
@@ -29,7 +33,15 @@ exports.unique=function (req,res) {
         });
 };
 
-//帐号注册
+/**
+ * @description 注册帐号
+ * @param req
+ * @param req.body.account {String} 帐号email
+ * @param req.body.password {String} 密码
+ * @param req.body.nickName {String} 用户昵称
+ * @param res
+ * @returns {*|any}
+ */
 exports.signup=function(req,res){
 
     //验证帐号是否合法
@@ -93,6 +105,12 @@ exports.signup=function(req,res){
         });
 };
 
+/**
+ * @description 激活帐号
+ * @param req
+ * @param req.params.id {ObjectId} 用户id
+ * @param res
+ */
 exports.active=function(req,res){
     User.findById(req.params.id,function(err,user){
         if(err){
@@ -129,6 +147,14 @@ exports.active=function(req,res){
     });
 };
 
+/**
+ * @description 用户登录
+ * @param req
+ * @param req.body.account {String} 帐号email
+ * @param req.body.password {String} 密码
+ * @param res
+ * @returns {*|any}
+ */
 exports.signin=function(req,res){
     req.checkBody('account','ACCOUNT_REQUIRED&MUST_BE_EMAIL').notEmpty().isEmail();
     req.checkBody('password','PASSWORD_REQUIRED&MUST_BETWEEN_6-20').notEmpty().isLength(6,20);
@@ -171,21 +197,7 @@ exports.signin=function(req,res){
                         msg:'USER_IS_NOT_ACTIVE'
                     });
             }else if(util.hashPW(req.body.password)===user.hashedPassword){
-                req.session.regenerate(function(){
-                    req.session.user=user._id;
-                    req.session.account=user.account;
-                    req.session.nickName=user.nickName;
-                    req.session.msg='Authenticated as '+user.nickName;
-
-                    user.set('lastOnline',Date.now());
-
-                    user.save(function(err){
-                        if(err){
-                            return res.status(500).send({result:false,msg:err});
-                        }
-                        res.json(user);
-                    });
-                });
+                userService.generateSession(req,res,user);
             }else{
                 res
                     .status(400)
@@ -223,4 +235,54 @@ exports.update=function(req,res){
                 }
             });
     }
+};
+
+
+exports.authQQ=function(req,res){
+    let code=req.query.code;
+    let onGetOpenIdSuccess=function(data){
+        var openId=data.openid;
+
+        User.findOne()
+            .where('openId').equals(openId)
+            .exec(function(err,user){
+                if(err){
+                    return res.status(500).send(err);
+                }
+
+                //如果对应的openid用户已经存在，则直接登录
+                if(user){
+                    userService.generateSession(req,res,user);
+
+                }else{
+                    //如果openid不存在，则去获取qq用户信息，然后创建帐号
+                    User.create(account,function(err,user){
+
+                        if(err){
+                            //如果创建帐号发生错误，返回500错误
+                            return res.status(500).send({msg:err});
+                        }
+
+                        //帐号创建成功后，发送激活邮件
+                        mailService
+                            .sendActiveMail(user)
+                            .then(function (info) {
+                                console.log('Send Email Success',info.response);
+                            },function (err) {
+                                console.error('Send Email Failed',err);
+                            });
+
+                        //返回用户信息
+                        res.json(user);
+                    });
+                }
+            });
+    };
+
+    auth.getQQAccessToken(code)
+        .then(function(data){
+            auth.getQQOpenId(data.access_token)
+                .then(onGetOpenIdSuccess);
+        });
+
 };
