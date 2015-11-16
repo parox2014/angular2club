@@ -24,7 +24,10 @@ module.exports=function(server){
 
     var userRouter=express.Router();
 
+    //激活用户帐号
     userRouter.get('/active/:id',controllers.userCtrl.active);
+
+    //用户资料更新
     userRouter.put('/',auth.signinRequired,controllers.userCtrl.update);
 
     server.use('/user',userRouter);
