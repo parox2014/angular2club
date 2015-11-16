@@ -48,6 +48,8 @@ var UserSchema=new Schema({
     twitter:String,
     avatar:String,
     gender:String,//male为男性,female为女性
+    province:String,
+    city:String,
     address:String,
     website:String,
     birthday:Date,

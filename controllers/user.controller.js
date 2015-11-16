@@ -7,7 +7,7 @@ const util=require('../util/util');
 const config=require('../config');
 const https=require('https');
 const querystring=require('querystring');
-const auth=require('../middlewares/auth');
+const EventProxy=require('eventproxy');
 const userService=require('../services/user.service');
 /**
  * @description 验证用户帐号是否唯一
@@ -197,7 +197,10 @@ exports.signin=function(req,res){
                         msg:'USER_IS_NOT_ACTIVE'
                     });
             }else if(util.hashPW(req.body.password)===user.hashedPassword){
-                userService.generateSession(req,res,user);
+                userService.generateSession(req,res,user)
+                    .then(function(data){
+                        res.json(data);
+                    });
             }else{
                 res
                     .status(400)
@@ -240,8 +243,16 @@ exports.update=function(req,res){
 
 exports.authQQ=function(req,res){
     let code=req.query.code;
+    let ep=new EventProxy();
+    let accessToken,openId;
+
+    const FIND_USER_FROM_DB='findUserFromDb';
+    const GET_QQ_USER_INFO_SUCCESS='getQQUserInfoSuccess';
+
+
+
     let onGetOpenIdSuccess=function(data){
-        var openId=data.openid;
+        openId=data.openid;
 
         User.findOne()
             .where('openId').equals(openId)
@@ -249,39 +260,56 @@ exports.authQQ=function(req,res){
                 if(err){
                     return res.status(500).send(err);
                 }
+                ep.emit(FIND_USER_FROM_DB,user);
+            });
 
-                //如果对应的openid用户已经存在，则直接登录
-                if(user){
-                    userService.generateSession(req,res,user);
-
-                }else{
-                    //如果openid不存在，则去获取qq用户信息，然后创建帐号
-                    User.create(account,function(err,user){
-
-                        if(err){
-                            //如果创建帐号发生错误，返回500错误
-                            return res.status(500).send({msg:err});
-                        }
-
-                        //帐号创建成功后，发送激活邮件
-                        mailService
-                            .sendActiveMail(user)
-                            .then(function (info) {
-                                console.log('Send Email Success',info.response);
-                            },function (err) {
-                                console.error('Send Email Failed',err);
-                            });
-
-                        //返回用户信息
-                        res.json(user);
-                    });
-                }
+        userService.getQQUserInfo(accessToken,openId)
+            .then(function(data){
+                ep.emit(GET_QQ_USER_INFO_SUCCESS,data);
             });
     };
 
-    auth.getQQAccessToken(code)
+
+    ep.all(FIND_USER_FROM_DB,GET_QQ_USER_INFO_SUCCESS,function(user,data){
+
+        var account={
+            account:openId,
+            openId:openId,
+            nickName:data.nickname,
+            gender:data.gender,
+            avatar:data.figureurl_qq_1,
+            province:data.province,
+            city:data.city,
+            type:2,
+            isActive:true
+        };
+
+        let onSaveUserSuccess=function(err,doc){
+
+            if(err){
+                //如果创建帐号发生错误，返回500错误
+                return res.status(500).send({msg:err});
+            }
+
+            userService.generateSession(req,res,doc)
+                .then(function(doc){
+                    res.redirect('/');
+                });
+        };
+
+        if(user){
+            user.save(account,onSaveUserSuccess);
+        }else{
+            User.create(account,onSaveUserSuccess);
+        }
+
+    });
+
+
+    userService.getQQAccessToken(code)
         .then(function(data){
-            auth.getQQOpenId(data.access_token)
+            accessToken=data.access_token;
+            userService.getQQOpenId(accessToken)
                 .then(onGetOpenIdSuccess);
         });
 

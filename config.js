@@ -28,7 +28,7 @@ const config={
         PATH:path.join('/upload/'),
         URL:'/upload/'
     },
-    thirdPart:{
+    oAuth:{
         qq:{
             APP_ID:101268680,
             APP_KEY:'0bd1ac2e7948d03f0f75128239d71910',
@@ -36,7 +36,7 @@ const config={
             HOST_NAME:'graph.qq.com',
             PATH_ACCESS_TOKEN:'/oauth2.0/token?',
             PATH_OPEN_ID:'/oauth2.0/me?',
-            PATH_GET_USER_INFO:'/user/get_user_info'
+            PATH_GET_USER_INFO:'/user/get_user_info?'
         },
         weixin:{
 

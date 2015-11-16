@@ -1,8 +1,9 @@
+'use strict';
 const config=require('../config');
 const https=require('https');
 const querystring=require('querystring');
 const util=require('../util/util');
-const qqAuthConfig=config.thirdPart.qq;
+const qqAuthConfig=config.oAuth.qq;
 
 exports.getQQAccessToken=function(code){
 
@@ -79,23 +80,57 @@ exports.getQQOpenId=function(accessToken){
 
 
 exports.getQQUserInfo=function(accessToken,openId){
+    let params={
+        access_token:accessToken,
+        openid:openId,
+        oauth_consumer_key:qqAuthConfig.APP_ID
+    };
 
+    let options={
+        hostname:qqAuthConfig.HOST_NAME,
+        path:qqAuthConfig.PATH_GET_USER_INFO+querystring.stringify(params),
+        method:'GET'
+    };
+
+    return new Promise(function(resolve,reject){
+        https
+            .request(options,function(response){
+                let data='';
+
+                response.on('data',function(chunk){
+                    data+=chunk;
+                    data=util.transformJSONPData(data);
+
+                    data=JSON.parse(data);
+
+                    resolve(data);
+                });
+            })
+            .on('error',function(err){
+                reject(err);
+            })
+            .end();
+    });
 };
 
 exports.generateSession=function(req,res,user){
-    req.session.regenerate(function(){
-        req.session.user=user._id;
-        req.session.account=user.account;
-        req.session.nickName=user.nickName;
-        req.session.msg='Authenticated as '+user.nickName;
 
-        user.set('lastOnline',Date.now());
+    return new Promise(function(resolve,reject){
+        req.session.regenerate(function(){
+            req.session.user=user._id;
+            req.session.account=user.account;
+            req.session.nickName=user.nickName;
+            req.session.msg='Authenticated as '+user.nickName;
 
-        user.save(function(err){
-            if(err){
-                return res.status(500).send({result:false,msg:err});
-            }
-            res.json(user);
+            user.set('lastOnline',Date.now());
+
+            user.save(function(err){
+                if(err){
+                    return res.status(500).send({result:false,msg:err});
+                }
+                resolve(user);
+            });
+
         });
     });
 };
