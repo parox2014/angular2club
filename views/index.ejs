@@ -6,10 +6,10 @@
 <h3 style="text-align: center;font-family: 'Microsoft Yahei';">github项目地址：<a href="https://github.com/WilliamDu1981/angular2club">https://github.com/WilliamDu1981/angular2club</a> </h3>
 <h3 style="text-align: center;font-family: 'Microsoft Yahei';">qq群:<a href="http://jq.qq.com/?_wv=1027&k=fkBdwB">461460156</a> ,欢迎志趣相投的朋友加入！</h3>
 
-<%if(data.user){%>
-    <p><%=data.user.account%></p>
-    <p><%=data.user.nickName%></p>
-    <img src="<%=data.user.avatar%>" alt="avatar">
+<%if(user){%>
+    <p><%=user.account%></p>
+    <p><%=user.nickName%></p>
+    <img src="<%=user.avatar%>" alt="avatar">
     <a href="/signout">退出登录</a>
 <%}else{%>
     <a href="/signin">请登录</a>

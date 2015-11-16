@@ -19,16 +19,14 @@ module.exports=function(server){
             User.findOne({_id:req.session.user},function(err,user){
                 res.render('index',Object.assign({
                     title:'angular2 club',
-                    data:{
-                        user:user
-                    }
-                },systemInfo))
-            })
+                    user:user,
+                },systemInfo));
+            });
         }else{
             res.render('index',Object.assign({
                 title:'angular2 club',
-                data:{}
-            },systemInfo))
+                user:null
+            },systemInfo));
         }
 
     });
