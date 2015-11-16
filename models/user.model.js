@@ -6,9 +6,14 @@ var ObjectId=Schema.Types.ObjectId;
 var UserSchema=new Schema({
     account:{
         type:String,
-        required:true
+        required:true,
+        unique:true
     },
     nickName:{
+        type:String,
+        required:true
+    },
+    hashedPassword:{
         type:String,
         required:true
     },
@@ -74,5 +79,10 @@ UserSchema.statics.unique=function (query) {
             });
     });
 };
+
+UserSchema.pre('save',function(next){
+    console.log(this.isNew);
+    next();
+});
 
 module.exports=mongoose.model('User',UserSchema);

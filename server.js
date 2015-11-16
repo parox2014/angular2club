@@ -9,8 +9,10 @@ var path=require('path');
 var config=require('./config');
 var routes=require('./routes/routes');
 var morgan=require('morgan');
-var favicon=require('serve-favicon')
-var db=mongoose.connect(config.DATABASE,function(err,e){
+var favicon=require('serve-favicon');
+var db=mongoose.connect(config.DATABASE,{
+    poolSize:20
+},function(err){
     if(!err){
         console.log('database connect success');
     }else{
