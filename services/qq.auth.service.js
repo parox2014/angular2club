@@ -46,19 +46,22 @@ class QQOAuth2{
 
         return new Promise(function(resolve,reject){
             let req=https.request(options,function(response){
-                let data='';
+                let buffers=[];
                 response.on('data',function(chunk){
-                    data+=chunk;
+                    buffers.push(chunk);
                 });
 
                 response.on('end',function(){
+                    let buf=Buffer.concat(buffers);
+                    let str=buf.toString('utf8');
+                    let result;
                     try{
-                        data=querystring.parse(data);
+                        result=querystring.parse(str);
                     }catch (e){
-                        data=JSON.parse(data);
+                        result=JSON.parse(str);
                     }
 
-                    resolve(data);
+                    resolve(result);
                 });
 
             });

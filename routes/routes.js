@@ -30,7 +30,7 @@ module.exports=function(server){
             res.render('index',Object.assign({
                 title:'angular2 club',
                 user:user,
-                topics:topics
+                topics:topics||[]
             },systemInfo));
         });
 
@@ -46,7 +46,8 @@ module.exports=function(server){
         }else{
             res.render('index',Object.assign({
                 title:'angular2 club',
-                user:null
+                user:null,
+                topics:[]
             },systemInfo));
         }
 
