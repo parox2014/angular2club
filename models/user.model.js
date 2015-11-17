@@ -16,11 +16,11 @@ var UserSchema=new Schema({
     hashedPassword:{
         type:String
     },
-    openId:String,
+    openId:String,//第三方帐号登录的用户ID
     description:String,
     type:{
         required:true,
-        type:Number,//1：注册用户，2：QQ用户，3：微信用户，4：微博用户
+        type:Number,//1：注册用户，2：QQ用户，3：微博用户:4:github用户,5:微信
         default:1
     },
     isActive:{
@@ -53,6 +53,10 @@ var UserSchema=new Schema({
     address:String,
     website:String,
     birthday:Date,
+    siteAdmin:{
+        type:Boolean,
+        default:false
+    },
     createAt:{
         type:Date,
         default:Date.now

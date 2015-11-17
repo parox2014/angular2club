@@ -3,7 +3,14 @@
 
 <div>
 
-    <h3><a href="https://graph.qq.com/oauth2.0/authorize?response_type=code&client_id=<%=config.oAuth.qq.APP_ID%>&redirect_uri=<%=encodeURIComponent(config.oAuth.qq.CALLBACK_URI)%>&state=<%=Date.now()%>">QQ登录</a> </h3>
+    <h3>
+        <a href="<%=qq%>">
+        QQ登录</a>
+    </h3>
+    <p>
+
+        <a href="<%=github%>">github登录</a>
+    </p>
 </div>
 
 <%include ../common/scripts.ejs%>

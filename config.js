@@ -38,14 +38,36 @@ const config={
             PATH_OPEN_ID:'/oauth2.0/me?',
             PATH_GET_USER_INFO:'/user/get_user_info?'
         },
-        weixin:{
+        weChat:{
 
         },
-        weibo:{
+        github:{
+            APP_ID:'48796150f263a025b74b',
+            APP_KEY:'d6744a1216fa4d097842b7c97967a22646794742',
+            CALLBACK_URI:'http://test.angular2.club/user/auth/github',
+            HOST_NAME:'github.com',
+            PATH_ACCESS_TOKEN:'/login/oauth/access_token?',
+            PATH_OPEN_ID:'/oauth2.0/me?',
+            PATH_GET_USER_INFO:'/user/get_user_info?',
+            SCOPE:['user']
+        },
+        microBlog:{
             APP_ID:4126929706,
             APP_KEY:'568324052c2ce439e5b7b7c4126d77e8'
         }
+    },
+    userType:{
+        REG_BY_SELF:1,
+        QQ:2,
+        MICRO_BLOG:3,
+        GITHUB:4,
+        WE_CHAT:5
+    },
+    topicType:{
+        SHARE:1,
+        QUESTION:2,
+        RECRUIT:3
     }
 };
-
+Object.freeze(config);
 module.exports=config;

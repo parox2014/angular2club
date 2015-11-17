@@ -13,7 +13,7 @@ var TopicSchema=new Schema({
         required:true
     },
     type:{
-        type:String,
+        type:Number,
         required:true
     },
     isTop: { type: Boolean, default: false }, // 置顶帖
@@ -35,19 +35,19 @@ var TopicSchema=new Schema({
     lastComment: { type: ObjectId },
     lastCommentAt: { type: Date, default: Date.now },
     meta:{
-        vote:{
+        votes:{
             type:Number,
             default:0
         },
-        fav:{
+        favs:{
             type:Number,
             default:0
         },
-        visit:{
+        visits:{
             type:Number,
             default:0
         },
-        comment:{
+        comments:{
             type:Number,
             default:0
         }

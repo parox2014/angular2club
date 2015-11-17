@@ -32,6 +32,38 @@
     </li>
     <%})%>
 </ul>-->
+
+<ul>
+    <%topics.forEach(function(topic){%>
+        <li>
+            <p><%=topic.title%></p>
+            <p><%=topic.content%></p>
+            <p><%=topic.createAt.toLocaleString()%></p>
+            <p><%=topic.createdBy%></p>
+            <p><%=topic.type%></p>
+        </li>
+    <%})%>
+</ul>
 <%include ./common/scripts.ejs%>
+<script>
+    /*(function(){
+        var xhr=new XMLHttpRequest();
+        var data={
+            "title":"fuck it",
+            "content":"fuck every day",
+            "type":1
+        };
+
+        xhr.open('POST','/topic');
+
+        xhr.setRequestHeader('Content-Type','application/json');
+
+        xhr.addEventListener('readyState',function(responseText){
+            console.log(responseText);
+        });
+
+        xhr.send(JSON.stringify(data));
+    })();*/
+</script>
 </body>
 <%include ./common/footer.ejs%>

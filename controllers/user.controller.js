@@ -4,11 +4,29 @@
 const User=require('../models/models').User;
 const mailService=require('../services/mail');
 const util=require('../util/util');
-const config=require('../config');
+
 const https=require('https');
 const querystring=require('querystring');
 const EventProxy=require('eventproxy');
-const userService=require('../services/user.service');
+
+const config=require('../config');
+const qqAuthConfig=config.oAuth.qq;
+const githubAuthConfig=config.oAuth.github;
+
+const QQOAuth2=require('../services/qq.auth.service');
+const qqAuthClient=new QQOAuth2(
+    qqAuthConfig.APP_ID,
+    qqAuthConfig.APP_KEY,
+    qqAuthConfig.CALLBACK_URI
+);
+
+const GitHubOAuth2=require('../services/github.auth.service');
+const githubAuthClient=new GitHubOAuth2(
+    githubAuthConfig.APP_ID,
+    githubAuthConfig.APP_KEY,
+    githubAuthConfig.CALLBACK_URI
+);
+
 /**
  * @description 验证用户帐号是否唯一
  * @param req
@@ -197,7 +215,7 @@ exports.signin=function(req,res){
                         msg:'USER_IS_NOT_ACTIVE'
                     });
             }else if(util.hashPW(req.body.password)===user.hashedPassword){
-                userService.generateSession(req,res,user)
+                util.generateSession(req,res,user)
                     .then(function(data){
                         res.json(data);
                     });
@@ -240,37 +258,64 @@ exports.update=function(req,res){
     }
 };
 
+//渲染登录页
+exports.showSignin=function(req,res){
+
+    if(req.session.user){
+        res.redirect('/');
+    }else{
+        res.render('signin/signin',{
+            title:'登录',
+            github:githubAuthClient.generateAuthUrl(githubAuthConfig.SCOPE),
+            qq:qqAuthClient.generateAuthUrl()
+        });
+    }
+};
 
 exports.authQQ=function(req,res){
     let code=req.query.code;
-    let ep=new EventProxy();
+    let proxy=new EventProxy();
     let accessToken,openId;
 
+    const ON_GET_TOKEN='getTokenSuccess';
+    const ON_GET_OPEN_ID='getOpenIdSuccess';
     const FIND_USER_FROM_DB='findUserFromDb';
     const GET_QQ_USER_INFO_SUCCESS='getQQUserInfoSuccess';
 
+    if(!qqAuthClient.isQQAuthState(req.query.state)){
+        return res.status(403).send({result:false,msg:'state is incorrect'});
+    }
 
+    proxy.on(ON_GET_TOKEN,function(token){
+        qqAuthClient
+            .getOpenId(token)
+            .then(function(data){
+                openId=data.openid;
 
-    let onGetOpenIdSuccess=function(data){
-        openId=data.openid;
+                proxy.emit(ON_GET_OPEN_ID,openId);
+            });
+    });
 
-        User.findOne()
-            .where('openId').equals(openId)
+    proxy.on(ON_GET_OPEN_ID,function(openId){
+
+        User.findOne({openId:openId})
             .exec(function(err,user){
                 if(err){
                     return res.status(500).send(err);
                 }
-                ep.emit(FIND_USER_FROM_DB,user);
+                proxy.emit(FIND_USER_FROM_DB,user);
+                console.log(FIND_USER_FROM_DB);
             });
 
-        userService.getQQUserInfo(accessToken,openId)
+        qqAuthClient
+            .getUserInfo(accessToken,openId)
             .then(function(data){
-                ep.emit(GET_QQ_USER_INFO_SUCCESS,data);
+                proxy.emit(GET_QQ_USER_INFO_SUCCESS,data);
+                console.log(GET_QQ_USER_INFO_SUCCESS);
             });
-    };
+    });
 
-
-    ep.all(FIND_USER_FROM_DB,GET_QQ_USER_INFO_SUCCESS,function(user,data){
+    proxy.all(FIND_USER_FROM_DB,GET_QQ_USER_INFO_SUCCESS,function(user,data){
 
         var account={
             account:openId,
@@ -280,7 +325,7 @@ exports.authQQ=function(req,res){
             avatar:data.figureurl_qq_1,
             province:data.province,
             city:data.city,
-            type:2,
+            type:config.userType.QQ,
             isActive:true
         };
 
@@ -291,7 +336,8 @@ exports.authQQ=function(req,res){
                 return res.status(500).send({msg:err});
             }
 
-            userService.generateSession(req,res,doc)
+            util
+                .generateSession(req,res,doc)
                 .then(function(doc){
                     res.redirect('/');
                 });
@@ -305,12 +351,81 @@ exports.authQQ=function(req,res){
 
     });
 
-
-    userService.getQQAccessToken(code)
+    qqAuthClient
+        .getToken(code)
         .then(function(data){
             accessToken=data.access_token;
-            userService.getQQOpenId(accessToken)
-                .then(onGetOpenIdSuccess);
+            proxy.emit(ON_GET_TOKEN,accessToken);
         });
+};
 
+exports.authGithub=function(req,res){
+    let code=req.query.code;
+    let proxy=new EventProxy();
+
+    const onGetTokenSuccess='getTokenSuccess';
+    const onGetUserSuccess='getUserSuccess';
+
+    let onError=function(err){
+        res.status(500).send(err);
+    };
+
+    //如果state不正确，返回错误，防止攻击
+    if(!githubAuthClient.isGithubAuthState(req.query.state)){
+        return res.status(403).send({result:false,msg:'state is incorrect'});
+    }
+
+    proxy.on(onGetTokenSuccess,function(token){
+        githubAuthClient
+            .getUserInfo(token)
+            .then(function(user){
+                proxy.emit(onGetUserSuccess,user);
+            },onError);
+    });
+
+    proxy.on(onGetUserSuccess,function(user){
+        var account={
+            account:user.email,
+            openId:user.id,
+            nickName:user.login,
+            avatar:user.avatar_url,
+            website:user.html_url,
+            github:user.email,
+            type:config.userType.GITHUB,
+            isActive:true
+        };
+
+        let onSaveUserSuccess=function(err,doc){
+
+            if(err){
+                //如果创建帐号发生错误，返回500错误
+                return res.status(500).send({msg:err});
+            }
+
+            util
+                .generateSession(req,res,doc)
+                .then(function(){
+                    res.redirect('/');
+                });
+        };
+
+        User.findOne({openId:user.id})
+            .exec(function(err,user){
+                if(err){
+                    return res.status(500).send(err);
+                }
+
+                if(user){
+                    user.save(account,onSaveUserSuccess)
+                }else{
+                    User.create(account,onSaveUserSuccess);
+                }
+            });
+    });
+
+    githubAuthClient
+        .getToken(code)
+        .then(function(data){
+            proxy.emit(onGetTokenSuccess,data.access_token);
+        },onError);
 };
