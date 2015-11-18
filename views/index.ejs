@@ -14,24 +14,6 @@
 <%}else{%>
     <a href="/signin">请登录</a>
 <%}%>
-<!--<ul>
-    <li>系统:<%=system%></li>
-    <li>平台:<%=platform%></li>
-    <li>内存:<%=(totalmem/1024/1024).toFixed(2)+'M'%></li>
-    <li>可用内存:<%=(freemem/1024/1024).toFixed(2)+'M'%></li>
-    <li>主机名:<%=hostName%></li>
-    <hr>
-    <h5>cpu</h5>
-    <%cpus.forEach(function(cpu){%>
-    <li>
-        <ul>
-            <li><%=cpu.model%></li>
-            <li><%=cpu.speed%></li>
-        </ul>
-
-    </li>
-    <%})%>
-</ul>-->
 
 <ul>
     <%topics.forEach(function(topic){%>
@@ -44,26 +26,27 @@
         </li>
     <%})%>
 </ul>
+
+<button id="btn">提交</button>
 <%include ./common/scripts.ejs%>
 <script>
-    /*(function(){
-        var xhr=new XMLHttpRequest();
-        var data={
-            "title":"fuck it",
-            "content":"fuck every day",
-            "type":1
-        };
+    (function(){
 
-        xhr.open('POST','/topic');
-
-        xhr.setRequestHeader('Content-Type','application/json');
-
-        xhr.addEventListener('readyState',function(responseText){
-            console.log(responseText);
-        });
-
-        xhr.send(JSON.stringify(data));
-    })();*/
+        document.querySelector('#btn')
+                .addEventListener('click',function(){
+                    sendAjax({
+                        url:'/user',
+                        data:{
+                            password:'parox606'
+                        },
+                        method:'PUT'
+                    },function(resp){
+                        console.log(resp);
+                    },function(status,text){
+                        console.error(status,text);
+                    }) ;
+                });
+    })();
 </script>
 </body>
 <%include ./common/footer.ejs%>

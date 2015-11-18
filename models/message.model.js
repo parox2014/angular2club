@@ -4,7 +4,7 @@ var mongoose=require('mongoose');
 var Schema=mongoose.Schema;
 var ObjectId=Schema.Types.ObjectId;
 var MessageSchema=new Schema({
-    content:{
+    comment:{
         type:String,
         required:true
     },
@@ -28,7 +28,7 @@ var MessageSchema=new Schema({
         type:Date,
         default:Date.now
     },
-    isRead:{
+    isReaded:{
         type:Boolean,
         default:false
     }

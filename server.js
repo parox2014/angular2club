@@ -88,4 +88,9 @@ server.listen(config.PORT,function(){
     console.log('server start success at port:'+config.PORT);
 });
 
+server.on('close',function(){
+    console.log('server closed');
+    mongoose.disconnect();
+});
+
 module.exports=server;

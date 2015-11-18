@@ -234,7 +234,7 @@ exports.signin=function(req,res){
 exports.update=function(req,res){
     var reqBody=req.body;
 
-    if(reqBody.account||req.password){
+    if(reqBody.account||reqBody.password){
         res.status(403).send({result:false,msg:'account don\'t allow to change'});
     }else{
         var update=Object.assign({
@@ -256,6 +256,18 @@ exports.update=function(req,res){
                 }
             });
     }
+};
+
+
+exports.getUserDetail=function(req,res){
+    User.findOne({_id:req.session.user})
+        .exec(function(err,user){
+            if(err){
+                res.status(500).send({result:false,msg:err});
+            } else {
+                res.json(user);
+            }
+        });
 };
 
 //渲染登录页

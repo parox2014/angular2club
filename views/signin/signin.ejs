@@ -3,6 +3,19 @@
 
 <div>
 
+    <form id="loginForm">
+        <div>
+            <input type="email" name="account">
+        </div>
+        <div>
+
+            <input type="password" name="password">
+        </div>
+        <div>
+            <button type="submit">登录</button>
+        </div>
+    </form>
+
     <h3>
         <a href="<%=qq%>">
         QQ登录</a>
@@ -14,5 +27,23 @@
 </div>
 
 <%include ../common/scripts.ejs%>
+<script>
+    document.querySelector('#loginForm')
+            .addEventListener('submit',function(e){
+                var parmas={
+                    account:document.querySelector('[name="account"]').value,
+                    password:document.querySelector('[name="password"]').value
+                };
+
+                e.preventDefault();
+                sendAjax({
+                    url:'/signin',
+                    method:'POST',
+                    data:parmas
+                },function(resp){
+                    console.log(resp);
+                });
+            });
+</script>
 </body>
 <%include ../common/footer.ejs%>

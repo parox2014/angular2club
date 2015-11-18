@@ -27,15 +27,23 @@ var UserSchema=new Schema({
         type:Boolean,
         default:false//帐号是否激活，默认未激活
     },
+    //用户积分
     score:{
         type:Number,
         default:0
     },
+    //发贴数
     postCount:{
         type:Number,
         default:0
     },
+    //评论数
     commentCount:{
+        type:Number,
+        default:0
+    },
+    //精华文章数
+    goodTopicCount:{
         type:Number,
         default:0
     },
@@ -69,6 +77,8 @@ var UserSchema=new Schema({
         type:Date,
         default:Date.now
     }
+},{
+    versionKey:false
 });
 
 

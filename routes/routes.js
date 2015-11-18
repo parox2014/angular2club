@@ -8,30 +8,24 @@ var querystring=require('querystring');
 var config=require('../config');
 var Topic=require('../models/models').Topic;
 var EventProxy=require('eventproxy');
-
+var controllers=require('../controllers/controllers');
+var userCtrl=controllers.userCtrl;
+var userRouter=require('./user.route');
+var topicRouter=require('./topic.route');
 module.exports=function(server){
-    var controllers=require('../controllers/controllers');
+
 
     server.get('/',function(req,res){
         var evtProxy=new EventProxy();
-        var systemInfo={
-            system:os.type(),
-            cpus:os.cpus(),
-            totalmem:os.totalmem(),
-            freemem:os.freemem(),
-            platform:os.platform(),
-            hostName:os.hostname()
-        };
-
         var findSessionUser='findSessionUserSuccess';
         var findTopics='findTopicsSuccess';
 
         evtProxy.all([findSessionUser,findTopics],function(user,topics){
-            res.render('index',Object.assign({
+            res.render('index',{
                 title:'angular2 club',
                 user:user,
                 topics:topics||[]
-            },systemInfo));
+            });
         });
 
         if(req.session.user){
@@ -39,19 +33,31 @@ module.exports=function(server){
                 evtProxy.emit(findSessionUser,user);
             });
 
-            Topic.find(function(err,topics){
-                evtProxy.emit(findTopics,topics);
-            });
+            Topic.find()
+                .where('createdBy').equals(req.session.user)
+                .exec(function(err,topics){
+                    evtProxy.emit(findTopics,topics);
+                });
 
         }else{
-            res.render('index',Object.assign({
+            res.render('index',{
                 title:'angular2 club',
                 user:null,
                 topics:[]
-            },systemInfo));
+            });
         }
 
     });
+
+    server.get('/signin',userCtrl.showSignin);
+
+    server.get('/signup',function(req,res){
+        res.render('signup/signup',{title:'注册'});
+    });
+
+    server.post('/signup',userCtrl.signup);
+
+    server.post('/signin',userCtrl.signin);
 
     server.get('/signout',function(req,res){
         req.session.destroy(function(){
@@ -61,33 +67,7 @@ module.exports=function(server){
 
 
 
-    server.get('/signin',controllers.userCtrl.showSignin);
-
-    server.get('/signup',function(req,res){
-        res.render('signup/signup',{title:'注册'});
-    });
-
-    server.post('/signup',controllers.userCtrl.signup);
-
-    server.post('/signin',controllers.userCtrl.signin);
-
-    var userRouter=express.Router();
-
-    userRouter.get('/active/:id',controllers.userCtrl.active);
-    userRouter.get('/unique',controllers.userCtrl.unique);
-    userRouter.put('/',auth.signinRequired,controllers.userCtrl.update);
-
-    userRouter.get('/auth/qq',controllers.userCtrl.authQQ);
-    userRouter.get('/auth/github',controllers.userCtrl.authGithub);
-
     server.use('/user',userRouter);
 
-
-    var topicRouter=express.Router();
-
-    topicRouter.post('/',controllers.topicCtrl.createTopic);
-
-    server.use('/topic',auth.signinRequired,topicRouter);
-
-
+    server.use('/topic',topicRouter);
 };

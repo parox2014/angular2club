@@ -21,8 +21,8 @@ const config={
     mail:{
         HOST: 'smtp.163.com',
         PORT: 25,
-        USER:'wdeagle@163.com',
-        PASS:'dzh20091117'
+        USER:'angular2_club@163.com',
+        PASS:'parox606'
     },
     upload:{
         PATH:path.join('/upload/'),
@@ -56,17 +56,26 @@ const config={
             APP_KEY:'568324052c2ce439e5b7b7c4126d77e8'
         }
     },
+    //注册用户类型
     userType:{
-        REG_BY_SELF:1,
-        QQ:2,
-        MICRO_BLOG:3,
-        GITHUB:4,
-        WE_CHAT:5
+        REG_BY_SELF:1,//自己注册
+        QQ:2,//qq登录
+        MICRO_BLOG:3,//微博登录
+        GITHUB:4,//github登录
+        WE_CHAT:5//微信登录
     },
+    //贴子类型
+    //1,分享,2，问题,3:招聘
     topicType:{
         SHARE:1,
         QUESTION:2,
         RECRUIT:3
+    },
+    //用户加分项目
+    score:{
+        TOPIC:10,//发贴
+        COMMENT:2,//评论
+        GOOD:10//精华
     }
 };
 Object.freeze(config);

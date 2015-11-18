@@ -33,7 +33,7 @@ var TopicSchema=new Schema({
         default:Date.now
     },
     lastComment: { type: ObjectId },
-    lastCommentAt: { type: Date, default: Date.now },
+    lastCommentAt: { type: Date },
     meta:{
         votes:{
             type:Number,
@@ -52,10 +52,16 @@ var TopicSchema=new Schema({
             default:0
         }
     }
+},{
+    versionKey:false
 });
 
 TopicSchema.index({createAt: -1});
 TopicSchema.index({isTop: -1, lastCommentAt: -1});
 TopicSchema.index({createdBy: 1, createAt: -1});
+
+TopicSchema.methods.isAuthor=function (userId) {
+    return this.createdBy.toString()===userId;
+};
 
 module.exports=mongoose.model('Topic',TopicSchema);

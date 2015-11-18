@@ -15,5 +15,29 @@
             var s = document.getElementsByTagName("script")[0];
             s.parentNode.insertBefore(hm, s);
         })();
+
+        function sendAjax(options,success,error){
+            var xhr=new XMLHttpRequest();
+            var data=options.data||{};
+            var method=options.method||'GET';
+
+
+            xhr.open(method,options.url);
+
+            xhr.setRequestHeader('Content-Type','application/json');
+            xhr.setRequestHeader('X-Requested-With','XMLHttpRequest')
+            xhr.addEventListener('readystatechange',function(e){
+                if(xhr.readyState===4){
+                    if(xhr.status===200){
+                        success(xhr.responseText);
+                    }else{
+                        error(xhr.status,xhr.statusText);
+                    }
+                }
+
+            });
+
+            xhr.send(JSON.stringify(data));
+        }
     </script>
 </head>
