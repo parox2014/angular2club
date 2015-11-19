@@ -55,6 +55,8 @@ class QQOAuth2{
                     let buf=Buffer.concat(buffers);
                     let str=buf.toString('utf8');
                     let result;
+
+                    logger.debug('token is:',str);
                     try{
                         result=querystring.parse(str);
                     }catch (e){
@@ -96,6 +98,9 @@ class QQOAuth2{
 
                     response.on('end',function(){
                         data=util.transformJSONPData(data);
+
+                        logger.debug('openId is:',data);
+
                         try{
                             data=JSON.parse(data);
 
@@ -121,7 +126,7 @@ class QQOAuth2{
         let params={
             access_token:token,
             openid:openId,
-            oauth_consumer_key:qqAuthConfig.APP_ID
+            oauth_consumer_key:this._appId
         };
 
 
@@ -139,10 +144,12 @@ class QQOAuth2{
                     });
 
                     response.on('end',function(){
-                        try{
-                            data=querystring.parse(data);
-                        }catch (e){
-                            data=JSON.parse(data);
+                        logger.debug('userInfo is:',data);
+
+                        data=JSON.parse(data);
+
+                        if(data.ret===-1){
+                            return reject(data);
                         }
 
                         resolve(data);

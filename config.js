@@ -22,7 +22,7 @@ const config={
         HOST: 'smtp.163.com',
         PORT: 25,
         USER:'angular2_club@163.com',
-        PASS:'parox606'
+        PASS:'pygrhmztmopdyefz'
     },
     upload:{
         PATH:path.join('/upload/'),
@@ -76,6 +76,9 @@ const config={
         TOPIC:10,//发贴
         COMMENT:2,//评论
         GOOD:10//精华
+    },
+    messageType:{
+
     }
 };
 Object.freeze(config);

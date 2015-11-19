@@ -14,7 +14,7 @@ userRouter.get('/unique',userCtrl.unique);
 userRouter.put('/',auth.signinRequired,userCtrl.update);
 
 //获取用户资料
-userRouter.get('/',auth.signinRequired,userCtrl.getUserDetail);
+userRouter.get('/:id',auth.signinRequired,userCtrl.getUserDetail);
 
 
 //QQ授权登录

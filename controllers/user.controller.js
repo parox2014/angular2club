@@ -234,33 +234,28 @@ exports.signin=function(req,res){
 exports.update=function(req,res){
     var reqBody=req.body;
 
-    if(reqBody.account||reqBody.password){
-        res.status(403).send({result:false,msg:'account don\'t allow to change'});
-    }else{
-        var update=Object.assign({
-            updateAt:Date.now()
-        },reqBody);
+    var update=Object.assign({},reqBody);
 
-        if(update.password){
-            update.hashedPassword=util.hashPW(update.password);
-        }
-
-        User
-            .update({$set:update})
-            .where('_id').equals(req.session.user)
-            .exec(function(err,result){
-                if(err){
-                    res.status(500).send({result:false,msg:err});
-                } else {
-                    res.json(result);
-                }
-            });
-    }
+    User
+        .findByIdAndUpdate(
+            req.session.user,
+            {$set:{profile:update}}
+        )
+        .exec(function(err,result){
+            if(err){
+                res.status(500).send({result:false,msg:err});
+            } else {
+                res.json(result);
+            }
+        });
 };
 
 
 exports.getUserDetail=function(req,res){
-    User.findOne({_id:req.session.user})
+    var uid=req.params.id;
+
+    User.findOne({_id:uid})
+        .populate('topics','title content')
         .exec(function(err,user){
             if(err){
                 res.status(500).send({result:false,msg:err});
@@ -324,6 +319,12 @@ exports.authQQ=function(req,res){
             .then(function(data){
                 proxy.emit(GET_QQ_USER_INFO_SUCCESS,data);
                 console.log(GET_QQ_USER_INFO_SUCCESS);
+            },function(err){
+                res.status(500).render('error',{
+                    title:err.msg,
+                    message:err.msg,
+                    error:err
+                });
             });
     });
 
@@ -333,19 +334,25 @@ exports.authQQ=function(req,res){
             account:openId,
             openId:openId,
             nickName:data.nickname,
-            gender:data.gender,
-            avatar:data.figureurl_qq_1,
-            province:data.province,
-            city:data.city,
             type:config.userType.QQ,
-            isActive:true
+            isActive:true,
+            profile:{
+                gender:data.gender,
+                avatar:data.figureurl_qq_1,
+                province:data.province,
+                city:data.city
+            }
         };
 
         let onSaveUserSuccess=function(err,doc){
 
             if(err){
                 //如果创建帐号发生错误，返回500错误
-                return res.status(500).send({msg:err});
+                return res.status(500).render('error', {
+                    title:err.message,
+                    message: err.message,
+                    error: err
+                });
             }
 
             util
@@ -400,11 +407,13 @@ exports.authGithub=function(req,res){
             account:user.email,
             openId:user.id,
             nickName:user.login,
-            avatar:user.avatar_url,
-            website:user.html_url,
-            github:user.email,
             type:config.userType.GITHUB,
-            isActive:true
+            isActive:true,
+            profile:{
+                avatar:user.avatar_url,
+                website:user.html_url,
+                github:user.email
+            }
         };
 
         let onSaveUserSuccess=function(err,doc){
@@ -422,6 +431,7 @@ exports.authGithub=function(req,res){
         };
 
         User.findOne({openId:user.id})
+            .select('_id')
             .exec(function(err,user){
                 if(err){
                     return res.status(500).send(err);

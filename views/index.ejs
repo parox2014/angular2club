@@ -35,10 +35,7 @@
         document.querySelector('#btn')
                 .addEventListener('click',function(){
                     sendAjax({
-                        url:'/user',
-                        data:{
-                            password:'parox606'
-                        },
+                        url:'/topic/564d69192080fc341884503b/vote?vote=1',
                         method:'PUT'
                     },function(resp){
                         console.log(resp);

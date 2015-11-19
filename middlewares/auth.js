@@ -17,7 +17,17 @@ exports.signinRequired=function (req,res,next) {
 };
 
 exports.adminRequired=function (req,res,next) {
-    // body...
+    if(req.session.siteAdmin){
+        next()
+    }else{
+        logger.warn('需要管理员权限');
+        if(req.xhr){
+            res.set('X-Error','admin required');
+            res.status(403).send({msg:'admin required'})
+        }else{
+            res.redirect('/');
+        }
+    }
 };
 
 

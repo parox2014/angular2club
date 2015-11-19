@@ -10,20 +10,24 @@ var config=require('./config');
 var routes=require('./routes/routes');
 var morgan=require('morgan');
 var favicon=require('serve-favicon');
-var db=mongoose.connect(config.DATABASE,{
+
+var log4js = require('log4js');
+
+global.logger = log4js.getLogger();
+
+mongoose.connect(config.DATABASE,{
     poolSize:20
 },function(err){
     if(!err){
-        console.log('database connect success');
+        logger.info('database connect success');
     }else{
-        console.log(err.message);
+        logger.error(err.message);
     }
 });
 
 
 
 var server=express();
-
 
 server.set('view engine',config.VIEW_ENGINE);
 
@@ -74,23 +78,18 @@ if (server.get('env') === 'development') {
 }
 
 // 生产环境错误处理
-/*server.use(function(err, req, res, next) {
+server.use(function(err, req, res, next) {
     res.status(err.status || 500);
     res.render('error', {
         message: err.message,
         error: {}
     });
-});*/
+});
 
 server.locals.config=config;
 
 server.listen(config.PORT,function(){
-    console.log('server start success at port:'+config.PORT);
-});
-
-server.on('close',function(){
-    console.log('server closed');
-    mongoose.disconnect();
+    logger.info('server start success at port:'+config.PORT);
 });
 
 module.exports=server;

@@ -27,6 +27,7 @@
     "express-session": "^1.11.3",
     "express-validator": "^2.17.1",
     "favicon": "0.0.2",
+    "log4js": "^0.6.28",
     "moment": "*",
     "mongoose": "^4.1.5",
     "nodemailer": "^1.5.0",
