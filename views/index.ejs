@@ -9,25 +9,13 @@
 <%if(user){%>
     <p><%=user.account%></p>
     <p><%=user.nickName%></p>
-    <img src="<%=user.avatar%>" alt="avatar">
+    <img src="<%=user.profile.avatar%>" alt="avatar">
     <a href="/signout">退出登录</a>
 <%}else{%>
     <a href="/signin">请登录</a>
 <%}%>
 
-<ul>
-    <%topics.forEach(function(topic){%>
-        <li>
-            <p><%=topic.title%></p>
-            <p><%=topic.content%></p>
-            <p><%=topic.createAt.toLocaleString()%></p>
-            <p><%=topic.createdBy%></p>
-            <p><%=topic.type%></p>
-        </li>
-    <%})%>
-</ul>
 
-<button id="btn">提交</button>
 <%include ./common/scripts.ejs%>
 <script>
     (function(){

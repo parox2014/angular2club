@@ -1,3 +1,5 @@
+'use strict';
+
 const path=require('path');
 
 const DB_NAME='angular2club';//数据库名
@@ -6,10 +8,10 @@ const DB_PWD='parox606';//数据库密码
 const DB_URL='localhost/';//数据库地址
 
 const config={
-    HOST:'localhost',
+    HOST:'test.angular2.club',
     PORT:80,
     VIEW_ENGINE:'ejs',
-    DATABASE:'mongodb://'+DB_USER+':'+DB_PWD+'@'+DB_URL+DB_NAME,
+    DATABASE:`mongodb://${DB_USER}:${DB_PWD}@${DB_URL}${DB_NAME}`,
     CDN:'',
     SITE_ICON:'',
     SITE_LOG:'',
@@ -82,4 +84,5 @@ const config={
     }
 };
 Object.freeze(config);
+
 module.exports=config;

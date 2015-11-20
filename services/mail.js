@@ -43,7 +43,8 @@ exports.sendActiveMail=function (user) {
 
     options.html=ejs.render(mailTemplate,{
             user:user,
-            config:config
+            config:config,
+            link:`http://test.angular2.club/user/${user._id}/active`
         });
 
     return exports.sendMail(options);

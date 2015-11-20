@@ -2,10 +2,46 @@
 <body>
 
 <div>
+    <form id="signinForm">
+        <div>
+            <input name="account" type="email">
+        </div>
+        <div>
+            <input name="nickName" type="text">
+        </div>
+        <div>
+            <input name="password" type="password">
+        </div>
+        <div>
+            <button type="submit">注册</button>
+        </div>
+    </form>
 
-    <h3><a href="https://graph.qq.com/oauth2.0/authorize?response_type=code&client_id=<%=config.oAuth.qq.APP_ID%>&redirect_uri=<%=encodeURIComponent(config.oAuth.qq.CALLBACK_URI)%>&state=<%=Date.now()%>">QQ登录</a> </h3>
 </div>
 
 <%include ../common/scripts.ejs%>
+<script>
+    document.querySelector('#signinForm')
+            .addEventListener('submit',function(e){
+                e.preventDefault();
+
+                var parmas={
+                    account:document.querySelector('[name="account"]').value,
+                    nickName:document.querySelector('[name="nickName"]').value,
+                    password:document.querySelector('[name="password"]').value
+                };
+
+
+                sendAjax({
+                    url:'/signup',
+                    method:'POST',
+                    data:parmas
+                },function(resp){
+                    alert('注册成功,请前往邮箱激活帐号');
+                    console.log(resp);
+                });
+            });
+</script>
+
 </body>
 <%include ../common/footer.ejs%>

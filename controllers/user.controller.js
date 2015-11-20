@@ -63,13 +63,13 @@ exports.unique=function (req,res) {
 exports.signup=function(req,res){
 
     //验证帐号是否合法
-    req.checkBody('account','ACCOUNT_INCORRECT').notEmpty().isEmail();
+    req.checkBody('account','account required and must be an email').notEmpty().isEmail();
 
     //验证昵称是否合法
-    req.checkBody('nickName','NICKNAME_INCORRECT').notEmpty().isLength(2,20);
+    req.checkBody('nickName','nick name required and length must between 2-50').notEmpty().isLength(2,50);
 
     //验证密码是否合法
-    req.checkBody('password','password required and length must between 6-20').notEmpty().isLength(6,10);
+    req.checkBody('password','password required and length must between 6-20').notEmpty().isLength(6,20);
 
     var mapErrors=req.validationErrors(true);
 
