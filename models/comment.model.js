@@ -12,27 +12,28 @@ var CommentSchema=new Schema({
         type:ObjectId,
         required:true
     },
+    //回复
     replyTo:ObjectId,
-    createdBy:{
+    //创建者
+    creator:{
         type:ObjectId,
         required:true
     },
-    createAt:{
-        type:Date,
-        default:Date.now
-    },
-    updateAt:{
-        type:Date,
-        default:Date.now
-    },
-    vote:{
+    //赞成
+    votes:{
         type:Number,
         default:0
+    }
+},{
+    versionKey: false,
+    timestamps: {
+        createdAt: 'createdAt',
+        updatedAt: 'updatedAt'
     }
 });
 
 CommentSchema.index({_id: 1});
-CommentSchema.index({createdBy: 1, createAt: -1});
-CommentSchema.index({vote: 1});
+CommentSchema.index({creator: 1, createdAt: -1});
+CommentSchema.index({votes: 1});
 
 module.exports=mongoose.model('Comment',CommentSchema);

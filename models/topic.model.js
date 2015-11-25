@@ -60,9 +60,8 @@ const TopicSchema = new Schema({
         }
     });
 
-TopicSchema.index({ createAt: -1 });
 TopicSchema.index({ isTop: -1, lastCommentAt: -1 });
-TopicSchema.index({ createdBy: 1, createAt: -1 });
+TopicSchema.index({ creator: 1, createdAt: -1 });
 
 
 TopicSchema.methods.isAuthor = function (userId) {
