@@ -79,8 +79,11 @@ const config={
         COMMENT:2,//评论
         GOOD:10//精华
     },
+    //消息类型,1:回复您的贴子,2:回复评论,3:@ at您
     messageType:{
-
+        REPLY_TOPIC:1,
+        REPLY_COMMENT:2,
+        AT:3
     }
 };
 Object.freeze(config);
