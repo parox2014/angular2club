@@ -186,4 +186,19 @@ TopicSchema.statics.getMyFavorites=function (sessionUser) {
             });
     });
 };
+
+TopicSchema.statics.updateLastComment=function (topicId,commentId) {
+
+    return new Promise((resolve,reject) =>{
+        this.update({lastComment:commentId,lastCommentAt:Date.now()})
+            .where({_id:topicId})
+            .exec(function(err,result){
+                if(err){
+                    return reject(err);
+                }
+                resolve(result);
+            });
+    });
+};
+
 module.exports = mongoose.model('Topic', TopicSchema);
