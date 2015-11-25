@@ -28,7 +28,6 @@ var UserSchema=new Schema({
         type:Boolean,
         default:false//帐号是否激活，默认未激活
     },
-    topics:[{type:ObjectId,ref:'Topic'}],
     meta:{
         //用户积分
         score:{

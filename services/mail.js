@@ -1,55 +1,60 @@
 'use strict';
 
-const config=require('../config');
-const mailer=require('nodemailer');
-const transporter=mailer.createTransport({
-    host:config.mail.HOST,
-    port:config.mail.PORT,
-    auth:{
-        user:config.mail.USER,
-        pass:config.mail.PASS
+const config = require('../config');
+const mailer = require('nodemailer');
+const transporter = mailer.createTransport({
+    host: config.mail.HOST,
+    port: config.mail.PORT,
+    auth: {
+        user: config.mail.USER,
+        pass: config.mail.PASS
     }
 });
-const fs=require('fs');
+const fs = require('fs');
 
-const ejs=require('ejs');
+const ejs = require('ejs');
 
-let mailTemplate=fs.readFileSync('./views/mail/mail-active.ejs','utf-8');
+class Mail{
+    /**
+    *@description class mailservice
+    *@params tplPath {String} template path
+    *@params options {Object}
+    *@params options.from {String} mail address
+    *@params options.to {String} mail receiver
+    *@params options.subject {String} mail title
+    *@params options.html {String} mail content
+    * */
+    constructor(tplPath,options){
+        let defaults = {
+            from: `${config.SITE_NAME}<${config.mail.USER}>`,
+            to:'',
+            subject: `${config.SITE_NAME}帐号激活`,
+            html:''
+        };
 
-exports.sendMail=function (options) {
-    let defaults={
-        from:`${config.SITE_NAME}<${config.mail.USER}>`
-    };
+        this._options=Object.assign(defaults,options);
 
+        this._template=fs.readFileSync(tplPath,'utf-8');
 
-    options=Object.assign(defaults,options);
+    }
 
-    return  new Promise(function(resolve, reject) {
-        transporter.sendMail(options,function (err,info) {
-            if(err){
-                reject(err);
-            }else {
-                resolve(info);
-            }
+    sendMail(data,options){
+        options=Object.assign(this._options,options);
+
+        data=data||{};
+
+        options.html = ejs.render(this._template, data);
+
+        return new Promise(function (resolve, reject) {
+            transporter.sendMail(options, function (err, info) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(info);
+                }
+            });
         });
-    });
-};
+    }
+}
 
-exports.sendActiveMail=function (user) {
-    var options={
-        to:user.account,
-        subject:`${config.SITE_NAME}帐号激活`
-    };
-
-    options.html=ejs.render(mailTemplate,{
-            user:user,
-            config:config,
-            link:`http://test.angular2.club/user/${user._id}/active`
-        });
-
-    return exports.sendMail(options);
-};
-
-exports.sendRestMail=function (user) {
-
-};
+module.exports=Mail;

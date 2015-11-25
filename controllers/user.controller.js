@@ -2,7 +2,6 @@
 
 
 const User=require('../models/models').User;
-const mailService=require('../services/mail');
 const util=require('../util/util');
 
 const https=require('https');
@@ -26,6 +25,12 @@ const githubAuthClient=new GitHubOAuth2(
     githubAuthConfig.APP_KEY,
     githubAuthConfig.CALLBACK_URI
 );
+
+const Mail=require('../services/mail');
+const mailClient=new Mail('./views/mail/mail-active.ejs');
+
+console.log(qqAuthClient);
+console.log(mailClient);
 
 /**
  * @description 验证用户帐号是否唯一
@@ -108,14 +113,24 @@ exports.signup=function(req,res){
                     return res.status(500).send({msg:err});
                 }
 
+                let mailOption={
+                    to:user.account,
+                }
+
+                let data={
+                    user:user,
+                    config:config,
+                    link:`http://test.angular2.club/user/${user._id}/active`
+                }
+
                 //帐号创建成功后，发送激活邮件
-                mailService
-                 .sendActiveMail(user)
-                 .then(function (info) {
-                    console.log('Send Email Success',info.response);
-                 },function (err) {
-                    console.error('Send Email Failed',err);
-                 });
+                mailClient
+                    .sendMail(data,mailOption)
+                    .then(function (info) {
+                       console.log('Send Email Success',info.response);
+                    },function (err) {
+                       console.error('Send Email Failed',err);
+                    });
 
                 //返回用户信息
                 res.json(user);

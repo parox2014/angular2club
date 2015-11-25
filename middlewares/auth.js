@@ -1,5 +1,5 @@
 'use strict';
-const SIGNIN_URL='./signin';
+const SIGNIN_URL='/signin';
 
 
 exports.signinRequired=function (req,res,next) {

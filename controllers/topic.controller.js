@@ -40,9 +40,6 @@ exports.createTopic=function(req,res){
                     $inc:{
                         'meta.score':config.score.TOPIC,
                         'meta.topicCount':1
-                    },
-                    $push:{
-                        topics:doc._id
                     }
                 })
                 .where('_id').equals(sessionUser)
@@ -73,7 +70,7 @@ exports.getTopicList=function(req,res){
         .limit(limit)
         .skip(skip)
         .populate('creator','nickName profile.avatar')
-        .select('title type createdAt creator meta')
+        .select('title type createdAt creator meta favers')
         .exec(function(err,topics){
             if(err){
                 return res.status(500).send({msg:err});
@@ -181,6 +178,33 @@ exports.getTopicDetail=function(req,res){
         });
 };
 
+exports.getFavoriteTopics=function (req,res) {
+
+    let sessionUser=req.session.user;
+
+    Topic.getMyFavorites(sessionUser)
+        .then(function(docs){
+            res.json(docs);
+        },function(err){
+            res.status(500).send({msg:err});
+        });
+
+};
+
+exports.getVoteTopics=function (req,res) {
+    let sessionUser=req.session.user;
+
+    Topic
+        .find({voters:sessionUser})
+        .exec(function(err,docs){
+            if(err){
+                return res.status(500).send({msg:err});
+            }
+
+            res.json(docs);
+        });
+};
+
 exports.toggleIsTop=function(req,res){
     let topicId=req.params.topicId;
 
@@ -208,29 +232,26 @@ exports.toggleIsGood=function(req,res){
 exports.toggleVote=function(req,res){
     let topicId=req.params.topicId;
     let vote=Number(req.query.vote);
-    let modifer=vote===1?'$addToSet':'$pull';
-    let update={};
-
-    update[modifer]={
-        voters:req.session.user
-    };
-
 
     Topic
-        .update(update)
-        .where({_id:topicId})
-        .exec(function(err){
-            if(err){
-                return res.status(500).send({msg:err});
-            }
-
-            Topic.findById(topicId,function(err,topic){
-
-                topic.set('meta.votes',topic.voters.length);
-
-                topic.save(function(err,doc){
-                    res.json(doc);
-                });
-            });
+        .toggleVote(topicId,req.session.user,vote)
+        .then(function (doc) {
+            res.json(doc);
+        },function (err) {
+            return res.status(500).send({msg:err});
         });
 };
+
+exports.toggleFavorite=function(req,res){
+    let topicId=req.params.topicId;
+    let fav=Number(req.query.fav);
+
+    Topic
+        .toggleFavorite(topicId,req.session.user,fav)
+        .then(function (doc) {
+            res.json(doc);
+        },function (err) {
+            return res.status(500).send({msg:err});
+        });
+};
+

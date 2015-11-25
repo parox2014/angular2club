@@ -40,4 +40,16 @@ topicRouter.put(
     auth.signinRequired,
     topicCtrl.toggleVote);
 
+//收藏
+topicRouter.put(
+    '/:topicId/fav',
+    auth.signinRequired,
+    topicCtrl.toggleFavorite);
+
+//获取收藏的topic
+topicRouter.get('/favs/mine',auth.signinRequired,topicCtrl.getFavoriteTopics);
+
+//获取点赞的topic
+topicRouter.get('/votes/mine',auth.signinRequired,topicCtrl.getVoteTopics);
+
 module.exports=topicRouter;
