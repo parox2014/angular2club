@@ -3,13 +3,12 @@
 var express = require('express');
 var os = require('os');
 var auth = require('../middlewares/auth');
-var User = require('../models/models').User;
+var User = require('../models').User;
 var querystring = require('querystring');
 var config = require('../config');
-var Topic = require('../models/models').Topic;
+var Topic = require('../models').Topic;
 var EventProxy = require('eventproxy');
-var controllers = require('../controllers/controllers');
-var userCtrl = controllers.userCtrl;
+var signCtrl = require('../controllers/sign');
 var userRouter = require('./user.route');
 var topicRouter = require('./topic.route');
 
@@ -22,7 +21,7 @@ module.exports = function (server) {
 
         evtProxy.all([findSessionUser, findTopics], function (user, topics) {
             res.render('index', {
-                title: 'angular2 club',
+                title: config.SITE_NAME,
                 user: user,
                 topics: topics || []
             });
@@ -49,23 +48,21 @@ module.exports = function (server) {
 
     });
 
-    server.get('/signin', userCtrl.showSignin);
+    server.get('/signin', signCtrl.showSignin);
 
-    server.get('/signup', function (req, res) {
-        res.render('signup/signup', { title: '注册' });
-    });
+    server.get('/signup',signCtrl.showSignup);
 
-    server.post('/signup', userCtrl.signup);
+    server.post('/signup', signCtrl.signup);
 
-    server.post('/signin', userCtrl.signin);
+    server.post('/signin', signCtrl.signin);
 
-    server.get('/signout', function (req, res) {
-        req.session.destroy(function () {
-            res.redirect('/signin');
-        });
-    });
+    server.get('/signout', signCtrl.signout);
 
+    //QQ授权登录
+    server.get('/oauth/qq',signCtrl.qqOAuth);
 
+    //github授权登录
+    server.get('/oauth/github',signCtrl.githubOAuth);
 
     server.use('/user', userRouter);
 

@@ -10,8 +10,8 @@ exports.transformJSONPData=function(data){
     return data.replace(');','');
 };
 
-exports.generateSession=function(req,res,user){
-
+exports.generateSession=function(req,user,callback){
+    callback=callback||noop;
     return new Promise(function(resolve,reject){
         req.session.regenerate(function(){
             req.session.user=user._id;
@@ -25,8 +25,10 @@ exports.generateSession=function(req,res,user){
             user.save(function(err){
                 if(err){
                     reject(err);
+                    callback(err,undefined);
                 }else{
                     resolve(user);
+                    callback(undefined,user);
                 }
             });
 

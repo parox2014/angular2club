@@ -7,13 +7,15 @@ var MongoStore=require('connect-mongo')(session);
 var mongoose=require('mongoose');
 var path=require('path');
 var config=require('./config');
-var routes=require('./routes/routes');
+var routes=require('./routes');
 var morgan=require('morgan');
 var favicon=require('serve-favicon');
 
 var log4js = require('log4js');
 
 global.logger = log4js.getLogger();
+global.noop=function(){};
+
 
 mongoose.connect(config.DATABASE,{
     poolSize:20

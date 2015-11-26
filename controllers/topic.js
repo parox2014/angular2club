@@ -1,11 +1,11 @@
 'use strict';
 
-const Topic=require('../models/models').Topic;
+const Topic=require('../models').Topic;
 const EventProxy=require('eventproxy');
 const config=require('../config');
-const User=require('../models/models').User;
+const User=require('../models').User;
 const _=require('underscore');
-const util=require('../util/util');
+const util=require('../util');
 const mongoose=require('mongoose');
 const props=['title','content','type'];
 

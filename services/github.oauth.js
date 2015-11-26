@@ -2,7 +2,7 @@
 
 const https=require('https');
 const querystring=require('querystring');
-const util=require('../util/util');
+const util=require('../util');
 const githubAuthConfig={
     AUTH_URI:'https://github.com/login/oauth/authorize?',
     HOST_NAME:'github.com',

@@ -1,5 +1,5 @@
 var express=require('express');
-var topicCtrl=require('../controllers/controllers').topicCtrl;
+var topicCtrl=require('../controllers/topic');
 var topicRouter=express.Router();
 var auth=require('../middlewares/auth');
 

@@ -10,10 +10,6 @@ var UserSchema=new Schema({
         required:true,
         unique:true
     },
-    nickName:{
-        type:String,
-        required:true
-    },
     hashedPassword:{
         type:String
     },
@@ -51,6 +47,10 @@ var UserSchema=new Schema({
         }
     },
     profile:{
+        nickName:{
+            type:String,
+            required:true
+        },
         realName:String,
         mobile:String,
         email:String,
@@ -62,7 +62,7 @@ var UserSchema=new Schema({
         facebook:String,
         twitter:String,
         avatar:String,
-        gender:String,//male为男性,female为女性
+        gender:Number,//1为男性,0为女性
         province:String,
         city:String,
         address:String,

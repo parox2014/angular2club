@@ -2,7 +2,7 @@
 
 const https = require('https');
 const querystring = require('querystring');
-const util = require('../util/util');
+const util = require('../util');
 const qqAuthConfig = {
     HOST_NAME: 'graph.qq.com',
     PATH_ACCESS_TOKEN: '/oauth2.0/token?',
@@ -99,8 +99,6 @@ class QQOAuth2 {
                     response.on('end', function () {
                         data = util.transformJSONPData(data);
 
-                        logger.debug('openId is:', data);
-
                         try {
                             data = JSON.parse(data);
 
@@ -144,8 +142,6 @@ class QQOAuth2 {
                     });
 
                     response.on('end', function () {
-                        logger.debug('userInfo is:', data);
-
                         data = JSON.parse(data);
 
                         if (data.ret === -1) {
