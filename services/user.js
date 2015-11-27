@@ -5,9 +5,6 @@ const User=require('../models').User;
 const config=require('../config');
 const util=require('../util');
 
-const Mail=require('../services/mail');
-const mailClient=new Mail('./views/mail/mail-active.ejs');
-
 exports.findUserByOpenId=function(openId,callback){
     callback=callback||noop;
     return new Promise((resolve,reject)=>{
@@ -34,11 +31,11 @@ exports.createUser=function(params,callback){
                 //如果帐号已经存在,返回错误
                 if(isExist){
                     let err={
-                        code:500,
+                        code:403,
                         result:false,
                         msg:'account is exist'
                     };
-                    logger.error(err);
+
                     callback(err,undefined);
                     reject(err);
                     return;
@@ -55,28 +52,11 @@ exports.createUser=function(params,callback){
                     if(err){
                         callback(err,undefined);
                         reject(err);
+                        return;
                     }
-
-                    let mailOption= {
-                        to: user.account
-                    };
-
-                    let data={
-                        user:user,
-                        config:config,
-                        link:`http://test.angular2.club/user/${user._id}/active`
-                    };
 
                     callback(undefined,user);
                     resolve(user);
-                    //帐号创建成功后，发送激活邮件
-                    mailClient
-                        .sendMail(data,mailOption)
-                        .then(function (info) {
-                            logger.debug('Send Email Success:',info.response);
-                        },function (err) {
-                            logger.error('Send Email Failed:',err);
-                        });
                 });
             });
     });
@@ -154,6 +134,11 @@ exports.signin=function(params,callback){
     });
 };
 
+/**
+ * @description 激活帐号
+ * @param userId {ObjectId} 用户id
+ * @param [callback] {Function}
+ */
 exports.active=function(userId,callback){
     callback=callback||noop;
 

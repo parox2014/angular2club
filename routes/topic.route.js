@@ -1,7 +1,7 @@
 var express=require('express');
-var topicCtrl=require('../controllers/topic');
+var topicCtrl=require('../controllers').topicCtrl;
 var topicRouter=express.Router();
-var auth=require('../middlewares/auth');
+var auth=require('../middlewares');
 
 //获取topic列表
 topicRouter.get('/',topicCtrl.getTopicList);

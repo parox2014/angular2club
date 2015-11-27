@@ -1,68 +1,29 @@
 'use strict';
 
-var express = require('express');
-var os = require('os');
-var auth = require('../middlewares/auth');
-var User = require('../models').User;
-var querystring = require('querystring');
-var config = require('../config');
-var Topic = require('../models').Topic;
-var EventProxy = require('eventproxy');
-var signCtrl = require('../controllers/sign');
+var ctrls = require('../controllers');
+var SignCtrl = ctrls.SignCtrl;
 var userRouter = require('./user.route');
 var topicRouter = require('./topic.route');
 
 
 module.exports = function (server) {
-    server.get('/', function (req, res) {
-        var evtProxy = new EventProxy();
-        var findSessionUser = 'findSessionUserSuccess';
-        var findTopics = 'findTopicsSuccess';
+    server.get('/', ctrls.MainCtrl.getSessionUserAndAllTopics);
 
-        evtProxy.all([findSessionUser, findTopics], function (user, topics) {
-            res.render('index', {
-                title: config.SITE_NAME,
-                user: user,
-                topics: topics || []
-            });
-        });
+    server.get('/signin', SignCtrl.showSignin);
 
-        if (req.session.user) {
-            User.findOne({ _id: req.session.user }, function (err, user) {
-                evtProxy.emit(findSessionUser, user);
-            });
+    server.get('/signup',SignCtrl.showSignup);
 
-            Topic.find()
-                .where('createdBy').equals(req.session.user)
-                .exec(function (err, topics) {
-                    evtProxy.emit(findTopics, topics);
-                });
+    server.post('/signup', SignCtrl.signup);
 
-        } else {
-            res.render('index', {
-                title: 'angular2 club',
-                user: null,
-                topics: []
-            });
-        }
+    server.post('/signin', SignCtrl.signin);
 
-    });
-
-    server.get('/signin', signCtrl.showSignin);
-
-    server.get('/signup',signCtrl.showSignup);
-
-    server.post('/signup', signCtrl.signup);
-
-    server.post('/signin', signCtrl.signin);
-
-    server.get('/signout', signCtrl.signout);
+    server.get('/signout', SignCtrl.signout);
 
     //QQ授权登录
-    server.get('/oauth/qq',signCtrl.qqOAuth);
+    server.get('/oauth/qq',SignCtrl.qqOAuth);
 
     //github授权登录
-    server.get('/oauth/github',signCtrl.githubOAuth);
+    server.get('/oauth/github',SignCtrl.githubOAuth);
 
     server.use('/user', userRouter);
 
