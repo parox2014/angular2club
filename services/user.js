@@ -3,52 +3,129 @@
 const User=require('../models').User;
 
 const config=require('../config');
-const util=require('../util');
+const Util=require('../util');
+const _=require('underscore');
 
-exports.findUserByOpenId=function(openId,callback){
-    callback=callback||noop;
-    return new Promise((resolve,reject)=>{
-        User.findOne({openId:openId})
-            .exec((err,doc)=>{
-                if(err){
-                    callback(err);
-                    reject(err);
-                    return;
-                }
-                callback(undefined,doc);
-                resolve(doc);
-            });
-    });
-};
+class UserService {
 
-exports.createUser=function(params,callback){
+    /**
+     * 根据openid查询用户
+     * @param openId {String}
+     * @param callback {Function}
+     * @returns {Promise}
+     */
+    static findUserByOpenId(openId,callback){
+        callback=callback||noop;
 
-    callback=callback||noop;
+        return new Promise((resolve,reject)=>{
+            User.findOne({openId:openId})
+                .exec((err,doc)=>{
+                    if(err){
+                        callback(err);
+                        reject(err);
+                        return;
+                    }
+                    callback(undefined,doc);
+                    resolve(doc);
+                });
+        });
+    }
 
-    return new Promise((resolve,reject)=>{
-        User.unique({account:params.account})
-            .then(function (isExist) {
-                //如果帐号已经存在,返回错误
-                if(isExist){
-                    let err={
-                        code:403,
-                        result:false,
-                        msg:'account is exist'
-                    };
+    /**
+     * 验证用户的唯一性
+     * @param  {String}   value       [需验证的值]
+     * @param  {[String]}   uniqueField [需验证的字段]
+     * @param  {Function} callback    [回调]
+     * @return {[Promise]}               [返回promise]
+     */
+    static unique(value,uniqueField,callback){
+        if(!uniqueField){
+            //如果不传入比较字段，则默认为account
+            uniqueField='account';
+        }else if(_.isFunction(uniqueField)){
+            callback=uniqueField;
+            uniqueField='accout';
+        }
 
-                    callback(err,undefined);
-                    reject(err);
-                    return;
-                }
+        callback=callback||noop;
 
-                //如果帐号不存在，则创建帐号
-                let user=new User();
+        let query={};
 
-                user.set('account',params.account);
-                user.set('hashedPassword',util.hashPW(params.password));
-                user.set('profile.nickName',params.nickName);
+        query[uniqueField]=value;
+        logger.debug(query);
+        return new Promise(function(resolve, reject) {
+            User
+                .findOne(query)
+                .exec((err,doc)=>{
+                    if (err) {
+                        callback(err);
+                        reject(err);
+                        return;
+                    }
 
-                user.save(function(err,doc){
+                    let isExist=!!doc;
+                    callback(isExist);
+                    resolve(isExist);
+                });
+        });
+    }
+
+    /**
+     *  创建用户
+     * @param params {Object}
+     * @param [callback] {Function}
+     * @returns {Promise}
+     */
+    static createUser (params,callback){
+
+        let user=new User(params);
+
+        return user.save();
+    }
+
+    /**
+     * 登录
+     * @param account {String} email
+     * @param pwd {string}
+     * @param [callback] {Function}
+     * @returns {Promise}
+     */
+    static signin (account,pwd,callback){
+        callback=callback||noop;
+
+        return new Promise((resolve,reject)=>{
+            User.findOne({account:account})
+                .select('account nickName isActive hashedPassword')
+                .exec(function(err,user){
+
+                    if(err){
+                        err={
+                            code:500,
+                            result:false,
+                            msg:err
+                        };
+                    }else if(!user){
+                        err={
+                            code:404,
+                            result:false,
+                            msg:'user not found'
+                        };
+
+                    }else if(!user.isActive){
+                        logger.debug(user);
+                        err={
+                            code:403,
+                            result:false,
+                            msg:'user is not actived'
+                        };
+                    } else if(Util.createHash(pwd)!==user.hashedPassword){
+                        err={
+                            code:403,
+                            result:false,
+                            msg:'password incorrect'
+                        };
+                    }
+
                     if(err){
                         callback(err,undefined);
                         reject(err);
@@ -58,134 +135,75 @@ exports.createUser=function(params,callback){
                     callback(undefined,user);
                     resolve(user);
                 });
-            });
-    });
-
-};
-
-exports.createUserByThirdPartyInfo=function(userInfo,callback){
-    callback=callback||noop;
-
-    return new Promise((resolve,reject)=>{
-        let user=new User(userInfo);
-
-        user.save(function(err,doc){
-            if(err){
-                callback(err,undefined);
-                reject(err);
-                return;
-            }
-
-            callback(undefined,doc);
-            resolve(doc);
         });
-    });
-};
+    }
 
-exports.updateUser=(params,callback)=>{
+    /**
+     * 用户帐号激活
+     * @param id {ObjectId} userid
+     * @param [callback] {Function}
+     */
+    static active (id,callback){
+        callback=callback||noop;
 
-};
+        new Promise((resolve,reject)=>{
 
-exports.signin=function(params,callback){
-    callback=callback||noop;
+            User.findById(id)
+                .select('isActive')
+                .exec(function(err,user){
+                    if(err){
+                        err={
+                            code:500,
+                            result:false,
+                            msg:err
+                        };
+                    }else if(!user) {
 
-    return new Promise((resolve,reject)=>{
-        User.findOne({account:params.account})
-            .select('account nickName isActive hashedPassword')
-            .exec(function(err,user){
+                        err={
+                            code:404,
+                            result:false,
+                            msg:'user not found'
+                        };
+                    }else if(user.get('isActive')){
+                        err={
+                            code:403,
+                            result:false,
+                            msg:'user is actived'
+                        };
+                    }
 
-                if(err){
-                    err={
-                        code:500,
-                        result:false,
-                        msg:err
-                    };
-                }else if(!user){
-                    err={
-                        code:404,
-                        result:false,
-                        msg:'user not found'
-                    };
-
-                }else if(!user.isActive){
-                    logger.debug(user);
-                    err={
-                        code:403,
-                        result:false,
-                        msg:'user is not actived'
-                    };
-                } else if(util.hashPW(params.password)!==user.hashedPassword){
-                    err={
-                        code:403,
-                        result:false,
-                        msg:'password incorrect'
-                    };
-                }
-
-                if(err){
-                    callback(err,undefined);
-                    reject(err);
-                    return;
-                }
-
-                callback(undefined,user);
-                resolve(user);
-            });
-    });
-};
-
-/**
- * @description 激活帐号
- * @param userId {ObjectId} 用户id
- * @param [callback] {Function}
- */
-exports.active=function(userId,callback){
-    callback=callback||noop;
-
-    new Promise((resolve,reject)=>{
-
-        User.findById(userId)
-            .select('isActive')
-            .exec(function(err,user){
-                if(err){
-                    err={
-                        code:500,
-                        result:false,
-                        msg:err
-                    };
-                }else if(!user) {
-
-                    err={
-                        code:404,
-                        result:false,
-                        msg:'user not found'
-                    };
-                }else if(user.get('isActive')){
-                    err={
-                        code:403,
-                        result:false,
-                        msg:'user is actived'
-                    };
-                }
-
-                if(err){
-                    callback(err,undefined);
-                    reject(err);
-                    return;
-                }
-
-                user.set('isActive',true);
-
-                user.save(function(err,doc){
                     if(err){
                         callback(err,undefined);
                         reject(err);
                         return;
                     }
-                    callback(undefined,doc);
-                    resolve(doc);
-                });
-            });
-    });
-};
 
+                    user.set('isActive',true);
+
+                    user.save(function(err,doc){
+                        if(err){
+                            callback(err,undefined);
+                            reject(err);
+                            return;
+                        }
+                        callback(undefined,doc);
+                        resolve(doc);
+                    });
+                });
+        });
+    }
+
+    /**
+     * 根据openId更新用户
+     * @param  {[String]}   openId   [description]
+     * @param  {[Object]}   params   [description]
+     * @param  {Function} callback [description]
+     * @return {[Promise]}            [description]
+     */
+    static updateByOpenId (openId,params,callback){
+        let query={openId:openId};
+        return User.findOneAndUpdate(query,params,callback);
+    }
+}
+
+module.exports=UserService;

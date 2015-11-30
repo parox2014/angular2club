@@ -30,4 +30,57 @@ exports.adminRequired=function (req,res,next) {
     }
 };
 
+exports.handleError=function (req,res,next) {
+    res.responseError=function (err) {
+        let code=err.code||500;
 
+        this.status(code);
+
+        //如果是异步请求，发送错误
+        if(req.xhr){
+            return this.send(err);
+        }
+
+        //如果不是异步请求，渲染错误页面
+        this.render('error', {
+                title:err.msg,
+                message: err.msg,
+                error: err
+            });
+    };
+    next();
+};
+
+exports.handleSession=function (req,res,next) {
+
+    req.generateSession=function (user,callback) {
+
+        callback=callback||noop;
+
+        return new Promise((resolve,reject)=>{
+            this.session.regenerate(()=>{
+                this.session.user=user._id;
+                this.session.account=user.account;
+                this.session.nickName=user.nickName;
+                this.session.siteAdmin=user.siteAdmin;
+                this.session.msg='Authenticated as '+user.nickName;
+
+                user.set('lastOnline',Date.now());
+
+                user.save(function(err){
+                    if(err){
+                        reject(err);
+                        callback(err,undefined);
+                        return;
+                    }
+
+                    resolve(user);
+                    callback(undefined,user);
+                });
+
+            });
+        });
+    };
+
+    next();
+};

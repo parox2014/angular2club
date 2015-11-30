@@ -2,9 +2,7 @@
 
 const https=require('https');
 const querystring=require('querystring');
-const util=require('../util');
-
-
+const Util=require('../util');
 const OAuth2=require('./oauth2');
 
 class GitHubOAuth2 extends OAuth2{
@@ -21,43 +19,9 @@ class GitHubOAuth2 extends OAuth2{
 
         this._requestOptions.hostname=this._config.HOST_NAME;
 
-        this._state=util.hashPW('github_oauth_angular2_club');
+        this._state=Util.createHash('github_oauth_angular2_club');
     }
 
-    /**
-     * @description get access token
-     * @param code {String} code
-     */
-/*    getToken(code){
-        let params={
-            client_id:this._appId,
-            client_secret:this._appKey,
-            code:code,
-            redirect_uri:this._redirectUrl
-        };
-
-        let options=Object.assign({
-            path:githubAuthConfig.PATH_ACCESS_TOKEN+querystring.stringify(params)
-        },this._requestOptions);
-
-        return new Promise(function(resolve,reject){
-            let req=https.get(options,function(response){
-                let data='';
-                response.on('data',function(chunk){
-                    data+=chunk;
-                });
-
-                response.on('end',function(){
-                    resolve(JSON.parse(data));
-                });
-            });
-
-            req.on('error',function(err){
-                reject(err);
-            });
-            req.end();
-        });
-    }*/
     /**
      * @description get user's info by access token
      * @param token {String} access token

@@ -1,35 +1,24 @@
-var express=require('express');
-var bodyParser=require('body-parser');
-var cookieParser=require('cookie-parser');
-var session=require('express-session');
-var expressValidator=require('express-validator');
-var MongoStore=require('connect-mongo')(session);
-var mongoose=require('mongoose');
-var path=require('path');
-var config=require('./config');
-var routes=require('./routes');
-var morgan=require('morgan');
-var favicon=require('serve-favicon');
+'use strict';
 
-var log4js = require('log4js');
-
+const log4js = require('log4js');
 global.logger = log4js.getLogger();
 global.noop=function(){};
 
+const express=require('express');
+const bodyParser=require('body-parser');
+const cookieParser=require('cookie-parser');
+const session=require('express-session');
+const expressValidator=require('express-validator');
+const MongoStore=require('connect-mongo')(session);
+const mongoose=require('mongoose');
+const path=require('path');
+const config=require('./config');
+const routes=require('./routes');
+const morgan=require('morgan');
+const favicon=require('serve-favicon');
+const middleware=require('./middlewares');
 
-mongoose.connect(config.DATABASE,{
-    poolSize:20
-},function(err){
-    if(!err){
-        logger.info('database connect success');
-    }else{
-        logger.error(err.message);
-    }
-});
-
-
-
-var server=express();
+const server=express();
 
 server.set('view engine',config.VIEW_ENGINE);
 
@@ -52,6 +41,10 @@ server.use(session({
     cookie:{maxAge:config.COOKIE_MAX_AGE},
     store:new MongoStore({ mongooseConnection: mongoose.connection })
 }));
+
+server.use(middleware.handleError);
+
+server.use(middleware.handleSession)
 
 routes(server);
 

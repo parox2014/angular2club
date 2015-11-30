@@ -1,12 +1,13 @@
 'use strict';
 
 const config=require('../config');
-const User=require('../services/user');
 const EventProxy=require('eventproxy');
-const util=require('../util');
+const Util=require('../util');
 const qqAuthConfig=config.oAuth.qq;
 const githubAuthConfig=config.oAuth.github;
 const services=require('../services');
+
+const User=services.User;
 
 const QQOAuth2=services.QQOAuth2;
 const qqAuthClient=new QQOAuth2(
@@ -97,32 +98,47 @@ class SignController{
             });
         }
 
+        let param={
+            account:req.body.account,
+            hashedPassword:Util.createHash(req.body.password),
+            profile:{
+                nickName:req.body.nickName
+            }
+        };
+
         User
-            .createUser(req.body)
-            .then(function(user){
-                res.json(user);
+            .unique(param.account)
+            .then(exist=>{
+                logger.debug(exist);
+                if(exist){
+                    return res.responseError({result:false,msg:'accout is exist'});
+                }
+
+                return User.createUser(param);
+            })
+            .then(doc=>{
 
                 let mailOption= {
-                    to: user.account
+                    to: doc.account
                 };
 
                 let data={
-                    user:user,
+                    user:doc,
                     config:config,
-                    link:`http://test.angular2.club/user/${user._id}/active`
+                    link:`http://test.angular2.club/user/${doc._id}/active`
                 };
 
+                res.json(doc);
 
                 //帐号创建成功后，发送激活邮件
-                mailClient
-                    .sendMail(data,mailOption)
-                    .then(function (info) {
-                        logger.debug('Send Email Success:',info.response);
-                    },function (err) {
-                        logger.error('Send Email Failed:',err);
-                    });
-            },function(err){
-                res.status(err.code).send(err);
+                return mailClient
+                        .sendMail(data,mailOption);
+            })
+            .then(info=>{
+                logger.debug('Send Email Success:',info.response);
+            })
+            .catch(err=>{
+                res.status(err.code||500).send(err);
             });
     }
 
@@ -165,15 +181,14 @@ class SignController{
         }
 
         User
-            .signin(req.body)
-            .then(function(user){
-
-                util.generateSession(req,user)
-                    .then(function(data){
-                        res.json(data);
-                    });
-
-            },function(err){
+            .signin(req.body.account,req.body.password)
+            .then(user=>{
+                return req.generateSession(user);
+            })
+            .then(data=>{
+                res.json(data);
+            })
+            .catch(err=>{
                 res.status(err.code).send(err);
             });
     }
@@ -222,12 +237,10 @@ class SignController{
             })
             .then(resp=>{
                 qqUser=resp;
-
-                logger.debug(`得到用户信息：${JSON.stringify(qqUser)}\n`);
                 //根据openId在数据库查找此用户
-                return User.findUserByOpenId(openId);
+                return User.unique(openId,'openId');
             })
-            .then(user=>{
+            .then(isExist=>{
 
                 let account={
                     account:'angular2club'+Date.now(),
@@ -244,22 +257,22 @@ class SignController{
                 };
                 //如果用户已经存在，就更新用户资料
                 //如果用户不存在，就创建用户
-                if(user){
+                if(isExist){
                     logger.debug(`用户已经存在，更新\n`);
-                    user.set('profile',account.profile);
-                    return user.save();
+                    return User.updateByOpenId(openId,{profile:account.profile});
+                    //return user.save();
                 }else{
                     logger.debug(`用户不存在，创建用户\n`);
-                    return User.createUserByThirdPartyInfo(account);
+                    return User.createUser(account);
                 }
             })
             .then(doc=>{
                 logger.debug(`创建或更新用户成功\n`);
-                util
-                    .generateSession(req,doc)
-                    .then(function(doc){
-                        res.redirect('/');
-                    });
+                logger.debug(doc);
+                return Util.generateSession(req,doc);
+            })
+            .then(doc=>{
+                res.redirect('/');
             })
             .catch(err=>{
 
@@ -281,17 +294,7 @@ class SignController{
      */
     static githubOAuth (req,res){
         let code=req.query.code;
-        let proxy=new EventProxy();
-        let githubUserInfo={};
-
-        const onGetTokenSuccess='getTokenSuccess';
-        const onGetUserSuccess='getUserSuccess';
-
-        let onError=function(err){
-            res.status(500).send(err);
-        };
-
-
+        let githubUserInfo;
 
         //如果state不正确，返回错误，防止攻击
         if(!githubAuthClient.validateState(req.query.state)){
@@ -308,9 +311,9 @@ class SignController{
                 logger.debug('得到用户信息\n');
                 githubUserInfo=resp;
 
-                return User.findUserByOpenId(githubUserInfo.id);
+                return User.unique(githubUserInfo.id,'openId');
             })
-            .then(user=>{
+            .then(isExist=>{
                 let account={
                     account:githubUserInfo.email,
                     openId:githubUserInfo.id,
@@ -324,31 +327,27 @@ class SignController{
                     }
                 };
 
-                logger.debug('数据库查找用户完成\n');
-                if(user){
-                    user.set('profile',account.profile);
-                    return user.save();
-                }else{
 
-                    return User.createUserByThirdPartyInfo(account);
+                if(isExist){
+                    logger.debug('用户已经存在，更新\n')
+                    return User.updateByOpenId(account.openId,account.profile);
+                    //return user.save();
+                }else{
+                    logger.debug('用户不存在，创建');
+                    return User.createUser(account);
                 }
             })
             .then(doc=>{
                 logger.debug('创建或更新用户成功\n');
 
-                util
-                    .generateSession(req,doc)
-                    .then(function(){
-                        res.redirect('/');
-                    });
+                return Util.generateSession(req,doc);
+
+            })
+            .then(doc=>{
+                res.redirect('/');
             })
             .catch(err=>{
-                logger.error('catch error',err);
-                res.status(err.code).render('error', {
-                    title:err.msg,
-                    message: err.msg,
-                    error: err
-                });
+                res.responseError(err);
             });
     }
 }

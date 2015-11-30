@@ -1,3 +1,5 @@
+'use strict';
+
 var express=require('express');
 var topicCtrl=require('../controllers').topicCtrl;
 var topicRouter=express.Router();
@@ -8,7 +10,6 @@ topicRouter.get('/',topicCtrl.getTopicList);
 
 //获取topic详情
 topicRouter.get('/:topicId',topicCtrl.getTopicDetail);
-
 
 //创建topic
 topicRouter.post('/',auth.signinRequired,topicCtrl.createTopic);

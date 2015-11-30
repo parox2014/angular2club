@@ -13,7 +13,10 @@ var UserSchema=new Schema({
     hashedPassword:{
         type:String
     },
-    openId:String,//第三方帐号登录的用户ID
+    openId:{
+        type:String,
+        unique:true
+    },//第三方帐号登录的用户ID
 
     type:{
         required:true,
@@ -95,7 +98,7 @@ UserSchema.statics.unique=function (query) {
                     reject(err);
                 }else{
                     let isExist=!!doc;
-                    resolve(isExist);
+                    resolve(isExist,doc);
                 }
             });
     });

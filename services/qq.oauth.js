@@ -2,7 +2,7 @@
 
 const https = require('https');
 const querystring = require('querystring');
-const util = require('../util');
+const Util = require('../util');
 const OAuth2=require('./oauth2');
 
 class QQOAuth2 extends OAuth2{
@@ -20,7 +20,7 @@ class QQOAuth2 extends OAuth2{
 
         this._requestOptions.hostname= this._config.HOST_NAME;
 
-        this._state = util.hashPW('qq_oauth_angular2_club');
+        this._state = Util.createHash('qq_oauth_angular2_club');
     }
 
     /**
