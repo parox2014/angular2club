@@ -10,11 +10,11 @@ const transporter = mailer.createTransport({
         pass: config.mail.PASS
     }
 });
-const fs = require('fs');
+const fs = require( 'fs' );
 
 const ejs = require('ejs');
 
-class Mail{
+class Mail {
     /**
     *@description class mailservice
     *@params tplPath {String} template path
@@ -24,24 +24,26 @@ class Mail{
     *@params options.subject {String} mail title
     *@params options.html {String} mail content
     * */
-    constructor(tplPath,options){
+    constructor(tplPath, options) {
         let defaults = {
             from: `${config.SITE_NAME}<${config.mail.USER}>`,
-            to:'',
+            to: '',
             subject: `${config.SITE_NAME}帐号激活`,
-            html:''
+            html: ''
         };
 
-        this._options=Object.assign(defaults,options);
+        this._options = Object.assign(defaults, options);
 
-        this._template=fs.readFileSync(tplPath,'utf-8');
+        this._template = fs.readFile(tplPath, 'utf-8');
 
     }
+    
+    
+    
+    sendMail(data, options) {
+        options = Object.assign(this._options, options);
 
-    sendMail(data,options){
-        options=Object.assign(this._options,options);
-
-        data=data||{};
+        data = data || {};
 
         options.html = ejs.render(this._template, data);
 
@@ -57,4 +59,4 @@ class Mail{
     }
 }
 
-module.exports=Mail;
+module.exports = Mail;

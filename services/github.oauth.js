@@ -1,57 +1,66 @@
 'use strict';
 
-const https=require('https');
-const querystring=require('querystring');
-const Util=require('../util');
-const OAuth2=require('./oauth2');
+const https = require('https');
+const querystring = require('querystring');
+const Util = require('../util');
+const OAuth2 = require('./oauth2');
 
-class GitHubOAuth2 extends OAuth2{
-    constructor(appId,appKey,redirectUrl){
+class GitHubOAuth2 extends OAuth2 {
 
-        super(appId,appKey,redirectUrl);
+  /**
+   * class GitHubOAuth2
+   * @method constructor
+   * @param  {[String]}    appId       [appId]
+   * @param  {[String]}    appKey      [appKey]
+   * @param  {[String]}    redirectUrl [redirectUrl]
+   * @return {[Object]}                [instant]
+   */
+  constructor(appId, appKey, redirectUrl) {
 
-        this._config={
-            OAUTH_URI:'https://github.com/login/oauth/authorize?',
-            HOST_NAME:'github.com',
-            PATH_ACCESS_TOKEN:'/login/oauth/access_token?',
-            SCOPE:['user']
-        };
+    super(appId, appKey, redirectUrl);
 
-        this._requestOptions.hostname=this._config.HOST_NAME;
+    this._config = {
+      OAUTH_URI: 'https://github.com/login/oauth/authorize?',
+      HOST_NAME: 'github.com',
+      PATH_ACCESS_TOKEN: '/login/oauth/access_token?',
+      SCOPE: ['user'],
+    };
 
-        this._state=Util.createHash('github_oauth_angular2_club');
-    }
+    this._requestOptions.hostname = this._config.HOST_NAME;
 
-    /**
-     * @description get user's info by access token
-     * @param token {String} access token
-     */
-    getUserInfo(token){
-        let params={
-            access_token:token
-        };
+    this._state = Util.createHash('github_oauth_angular2_club');
+  }
 
-        let options={
-            hostname:'api.github.com',
-            path:'/user?'+querystring.stringify(params),
-            headers:{
-                'Accept':'application/json',
-                'User-Agent':'angular2 club'
-            }
-        };
+  /**
+   * @description get user's info by access token
+   * @param token {String} access token
+   */
+  getUserInfo(token) {
+    let params = {
+      access_token: token,
+    };
 
-        return new Promise((resolve,reject)=>{
-            let req=https.request(options,resp=>{
-                this._handleResponse(resp,resolve,reject);
-            });
+    let options = {
+      hostname: 'api.github.com',
+      path: '/user?' + querystring.stringify(params),
+      headers: {
+        Accept: 'application/json',
+        'User-Agent': 'angular2 club',
+      },
+    };
 
-            req.on('error',function(err){
-                reject(err);
-            });
-            req.end();
-        });
-    }
+    return new Promise((resolve, reject) => {
+      let req = https.request(options, resp => {
+        this._handleResponse(resp, resolve, reject);
+      });
+
+      req.on('error', function(err) {
+        reject(err);
+      });
+
+      req.end();
+    });
+  }
 }
 
-
-module.exports=GitHubOAuth2;
+module.exports = GitHubOAuth2;

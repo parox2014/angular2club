@@ -5,27 +5,32 @@ var SignCtrl = ctrls.SignCtrl;
 var userRouter = require('./user.route');
 var topicRouter = require('./topic.route');
 
+module.exports = function(server) {
+  //渲染主页页
+  server.get('/', ctrls.MainCtrl.getSessionUserAndAllTopics);
 
-module.exports = function (server) {
-    server.get('/', ctrls.MainCtrl.getSessionUserAndAllTopics);
+  //渲染登录页面
+  server.get('/signin', SignCtrl.showSignin);
 
-    server.get('/signin', SignCtrl.showSignin);
+  //渲染注册页面
+  server.get('/signup', SignCtrl.showSignup);
 
-    server.get('/signup',SignCtrl.showSignup);
+  //注册
+  server.post('/signup', SignCtrl.signup);
 
-    server.post('/signup', SignCtrl.signup);
+  //登录
+  server.post('/signin', SignCtrl.signin);
 
-    server.post('/signin', SignCtrl.signin);
+  //退出
+  server.get('/signout', SignCtrl.signout);
 
-    server.get('/signout', SignCtrl.signout);
+  //QQ授权登录
+  server.get('/oauth/qq', SignCtrl.qqOAuth);
 
-    //QQ授权登录
-    server.get('/oauth/qq',SignCtrl.qqOAuth);
+  //github授权登录
+  server.get('/oauth/github', SignCtrl.githubOAuth);
 
-    //github授权登录
-    server.get('/oauth/github',SignCtrl.githubOAuth);
+  server.use('/users', userRouter);
 
-    server.use('/user', userRouter);
-
-    server.use('/topic', topicRouter);
+  server.use('/topics', topicRouter);
 };

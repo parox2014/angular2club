@@ -9,6 +9,7 @@
     "defaultParams": true,
     "blockBindings": true,
     "modules": true,
+    "node": true,
     "objectLiteralComputedProperties": true,
     "objectLiteralShorthandMethods": true,
     "objectLiteralShorthandProperties": true,
