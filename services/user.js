@@ -240,7 +240,7 @@ class UserService {
         let data = {
           user: doc,
           config: config,
-          link: `http://test.angular2.club/user/${doc._id}/active`,
+          link: `http://test.angular2.club/users/${doc._id}/active`,
         };
 
         mailClient

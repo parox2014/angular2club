@@ -47,9 +47,15 @@ server.use(session({
   }),
 }));
 
-server.use(middleware.handleError);
+/*server.use(middleware.handleError);
 
-server.use(middleware.handleSession);
+server.use(middleware.handleSession);*/
+
+server.use(function(req, res, next) {
+  res.xhr = req.xhr;
+  logger.debug(`request type is XMLHttpRequest:${res.xhr}`);
+  next();
+});
 
 routes(server);
 

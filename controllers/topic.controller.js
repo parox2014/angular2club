@@ -1,6 +1,6 @@
 'use strict';
 
-const Topic = require('../models').Topic;
+const Topic = require('../services').Topic;
 const EventProxy = require('eventproxy');
 const config = require('../config');
 const User = require('../models').User;
@@ -25,163 +25,61 @@ exports.createTopic = function(req, res) {
     });
   }
 
-  let topic = new Topic(util.pick(req.body, props));
+  let data = util.pick(req.body, props);
   let sessionUser = req.session.user;
 
-  topic.set('creator', sessionUser);
-
-  topic.save(function(err, doc) {
-    if (err) {
-      res.status(500).send({
-        msg: err,
-      });
-    } else {
-      //贴子发成功后，用户加分
-      User
-        .update({
-          $inc: {
-            'meta.score': config.score.TOPIC,
-            'meta.topicCount': 1,
-          },
-        })
-        .where('_id').equals(sessionUser)
-        .exec(function(err) {
-          if (err) {
-            return res.status(500).send({
-              msg: err,
-            });
-          }
-
-          res.json(doc);
-        });
-    }
-  });
-};
-
-exports.getTopicList = function(req, res) {
-  var query = req.query;
-  var limit = query.limit || 20;
-  var skip = query.start || '0';
-
-  var cond = Object.assign({
-    deleted: false,
-  }, query);
-
-  delete cond.limit;
-  delete cond.start;
-
-  Topic
-    .find()
-    .where(cond)
-    .limit(limit)
-    .skip(skip)
-    .populate('creator', 'nickName profile.avatar')
-    .select('title type createdAt creator meta favers')
-    .exec(function(err, topics) {
-      if (err) {
-        return res.status(500).send({
-          msg: err,
-        });
-      }
-
-      if (!topics) {
-        return res.send([]);
-      }
-
-      res.json(topics);
+  Topic.create(sessionUser, data)
+    .then(doc=> {
+      res.status(201).json(doc);
+    })
+    .catch(err=> {
+      res.responseError(err);
     });
 };
 
+exports.getTopicList = function(req, res) {
+  var query = Object.create(req.query);
+  var limit = query.limit || 20;
+  var skip = query.start || '0';
+
+  delete query.limit;
+  delete query.start;
+
+  Topic.getTopicListByQuery(query, limit, skip)
+    .then(docs=> {
+      res.json(docs);
+    })
+    .catch(err=> {
+      res.responseError(err);
+    });
+};
+
+let express = require('express');
 exports.updateTopic = function(req, res) {
   let topicId = req.params.topicId;
   let sessionUser = req.session.user;
   let update = util.pick(req.body, props);
 
-  Topic.findById(topicId, function(err, topic) {
-    if (err) {
-      return res.status(500).send({
-        msg: err,
-      });
-    }
-
-    if (!topic) {
-      return res.status(404).send({
-        msg: 'topic not found',
-      });
-    }
-
-    if (!topic.isAuthor(sessionUser)) {
-      return res.status(403).send({
-        msg: 'you are not the topic\'s author',
-      });
-    }
-
-    topic.set(update);
-
-    topic.save(function(err, doc) {
-      if (err) {
-        return res.status(500).send({
-          msg: err,
-        });
-      }
-
+  Topic.update(topicId, sessionUser, update)
+    .then(doc=> {
       res.json(doc);
+    })
+    .catch(err=> {
+      logger.error(err);
+      res.responseError(err);
     });
-  });
 };
 
 exports.removeTopic = function(req, res) {
   let topicId = req.params.topicId;
   let sessionUser = req.session.user;
 
-  Topic.findOneAndUpdate({
-      deleted: true,
+  Topic.softRemove(topicId, sessionUser)
+    .then(result=> {
+      res.status(204).send(result);
     })
-    .where({
-      _id: topicId,
-      creator: sessionUser,
-      deleted: false,
-    })
-    .exec(function(err, doc) {
-
-      if (err) {
-        return res.status(500).send({
-          msg: err,
-        });
-      }
-
-      if (!doc) {
-
-        return res.status(404).send({
-          msg: 'Topic not found or topic is already removed',
-        });
-      }
-
-      let goodScore = doc.isGood ? confog.score.GOOD : 0;
-
-      //当删除一篇文章，该用户的分数减去该文章所得分数，发贴数减一
-      User
-        .update({
-          $inc: {
-            'meta.score': -(config.score.TOPIC + goodScore),
-            'meta.topicCount': -1,
-          },
-          $pull: {
-            topics: doc._id,
-          },
-        })
-        .where('_id').equals(sessionUser)
-        .exec(function(err) {
-          if (err) {
-            return res.status(500).send({
-              msg: err,
-            });
-          }
-        });
-
-      res.send({
-        result: true,
-      });
+    .catch(err=> {
+      res.responseError(err);
     });
 };
 
@@ -189,21 +87,13 @@ exports.removeTopic = function(req, res) {
 exports.getTopicDetail = function(req, res) {
   let topicId = req.params.topicId;
 
-  Topic
-    .findByIdAndUpdate(topicId, {
-      $inc: {
-        'meta.visits': 1,
-      },
+  Topic.getById(topicId)
+    .then(doc=> {
+      res.json(doc);
     })
-    .populate('creator', 'nickName _id profile')
-    .exec(function(err, topic) {
-      if (err) {
-        return res.status(500).send({
-          msg: err,
-        });
-      }
-
-      res.json(topic);
+    .catch(err=> {
+      logger.debug(err);
+      res.responseError(err);
     });
 };
 
