@@ -5,9 +5,14 @@ const User = require('../models').User;
 const config = require('../config');
 const Util = require('../util');
 const _ = require('underscore');
+const Mail = require('./mail');
+const mailClient = new Mail('./views/mail/mail-active.ejs');
+const EventProxy = require('eventproxy');
 
 class UserService {
-
+  constructor() {
+    throw new Error('not need instance');
+  }
   /**
    * 根据openid查询用户
    * @param openId {String}
@@ -55,7 +60,7 @@ class UserService {
     let query = {};
 
     query[uniqueField] = value;
-    logger.debug(query);
+
     return new Promise(function(resolve, reject) {
       User
         .findOne(query)
@@ -117,7 +122,6 @@ class UserService {
             };
 
           } else if (!user.isActive) {
-            logger.debug(user);
             err = {
               code: 403,
               result: false,
@@ -151,7 +155,7 @@ class UserService {
   static active(id, callback) {
     callback = callback || noop;
 
-    new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
 
       User.findById(id)
         .select('isActive')
@@ -211,6 +215,70 @@ class UserService {
       openId: openId,
     };
     return User.findOneAndUpdate(query, params, callback);
+  }
+
+  /**
+   * 给用户发送邮件
+   * @method sendMailToUser
+   * @param  {[Object||String]}       user [用户的model或者id]
+   * @return {[promise]}            [description]
+   */
+  static sendMailToUser(user, callback) {
+    let proxy = new EventProxy();
+    let events = 'getUserSuccess';
+
+    callback = callback || noop;
+
+    return new Promise(function(resolve, reject) {
+
+      proxy.on(events, function(doc) {
+
+        let mailOption = {
+          to: doc.account,
+        };
+
+        let data = {
+          user: doc,
+          config: config,
+          link: `http://test.angular2.club/user/${doc._id}/active`,
+        };
+
+        mailClient
+          .sendMail(data, mailOption)
+          .then(function(info) {
+            resolve(info);
+            callback(null, info);
+          })
+          .catch(function(err) {
+            reject(err);
+            callback(err);
+          });
+      });
+
+      if (_.isObject(user)) {
+        proxy.emit(events, user);
+      }else {
+        User.findById(user)
+          .exec(function(err, doc) {
+
+            if (!doc) {
+              err = {
+                code:404,
+                result:false,
+                msg:'user not found',
+              };
+            }
+
+            if (err) {
+              callback(err);
+              return reject(err);
+            }
+
+            proxy.emit(events, doc);
+          });
+      }
+
+    });
   }
 }
 

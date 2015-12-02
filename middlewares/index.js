@@ -1,5 +1,4 @@
 'use strict';
-const SIGNIN_URL = '/signin';
 
 exports.signinRequired = function(req, res, next) {
   if (req.session.user) {
@@ -12,7 +11,7 @@ exports.signinRequired = function(req, res, next) {
         msg: 'signin required',
       });
     } else {
-      res.redirect(SIGNIN_URL);
+      res.redirect('/signin');
     }
   }
 };
@@ -64,12 +63,12 @@ exports.handleSession = function(req, res, next) {
     let session = this.session;
 
     return new Promise((resolve, reject) => {
-      session.regenerate(() => {
-        session.user = user._id;
-        session.account = user.account;
-        session.nickName = user.nickName;
-        session.siteAdmin = user.siteAdmin;
-        session.msg = 'Authenticated as ' + user.nickName;
+      req.session.regenerate(() => {
+        req.session.user = user._id;
+        req.session.account = user.account;
+        req.session.nickName = user.nickName;
+        req.session.siteAdmin = user.siteAdmin;
+        req.session.msg = 'Authenticated as ' + user.nickName;
 
         user.set('lastOnline', Date.now());
 

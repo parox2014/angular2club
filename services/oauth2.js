@@ -7,10 +7,12 @@ const util = require('../util');
 class OAuth2 {
 
   /**
-   * 构造函数
-   * @param appId
-   * @param appKey
-   * @param redirectUrl
+   * [constructor description]
+   * @method constructor
+   * @param  {[type]}    appId       [description]
+   * @param  {[type]}    appKey      [description]
+   * @param  {[type]}    redirectUrl [description]
+   * @return {[type]}                [description]
    */
   constructor(appId, appKey, redirectUrl) {
     this._appId = appId;

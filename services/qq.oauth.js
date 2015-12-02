@@ -6,6 +6,15 @@ const Util = require('../util');
 const OAuth2 = require('./oauth2');
 
 class QQOAuth2 extends OAuth2 {
+
+  /**
+   * [constructor description]
+   * @method constructor
+   * @param  {[type]}    appId       [description]
+   * @param  {[type]}    appKey      [description]
+   * @param  {[type]}    redirectUrl [description]
+   * @return {[type]}                [description]
+   */
   constructor(appId, appKey, redirectUrl) {
 
     super(appId, appKey, redirectUrl);

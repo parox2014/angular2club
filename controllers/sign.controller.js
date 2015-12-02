@@ -1,7 +1,6 @@
 'use strict';
 
 const config = require('../config');
-const EventProxy = require('eventproxy');
 const Util = require('../util');
 const qqAuthConfig = config.oAuth.qq;
 const githubAuthConfig = config.oAuth.github;
@@ -22,9 +21,6 @@ const githubAuthClient = new GitHubOAuth2(
   githubAuthConfig.APP_KEY,
   githubAuthConfig.CALLBACK_URI
 );
-
-const Mail = services.Mail;
-const mailClient = new Mail('./views/mail/mail-active.ejs');
 
 class SignController {
 
@@ -128,21 +124,10 @@ class SignController {
 
     //用户创建成功，发送激活邮件
     .then(doc => {
-
-      let mailOption = {
-        to: doc.account,
-      };
-
-      let data = {
-        user: doc,
-        config: config,
-        link: `http://test.angular2.club/user/${doc._id}/active`,
-      };
-
       res.status(201).json(doc);
 
       //帐号创建成功后，发送激活邮件
-      return mailClient.sendMail(data, mailOption);
+      return User.sendMailToUser(doc);
     })
 
     //邮件发送成功
@@ -152,10 +137,27 @@ class SignController {
 
     //捕捉错误
     .catch(err => {
+      logger.debug('Send Email Failed:', info.response);
       res.status(err.code || 500).send(err);
     });
   }
 
+  static sendMail(req, res) {
+    let id = req.query.id;
+
+    User.sendMailToUser(id)
+      .then(function(info) {
+        res.send({
+          result:true,
+          msg:'send mail Success',
+        });
+        logger.debug(info);
+      }, function(err)  {
+
+        res.responseError(err);
+        logger.err(err);
+      });
+  }
   /**
    * 用户登录
    * @param req

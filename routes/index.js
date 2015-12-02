@@ -21,6 +21,8 @@ module.exports = function(server) {
   //登录
   server.post('/signin', SignCtrl.signin);
 
+  server.post('/mail', SignCtrl.sendMail);
+
   //退出
   server.get('/signout', SignCtrl.signout);
 
