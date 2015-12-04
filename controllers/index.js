@@ -11,17 +11,17 @@ class MainController {
     var findSessionUser = 'findSessionUserSuccess';
     var findTopics = 'findTopicsSuccess';
 
-    evtProxy.all([findSessionUser, findTopics], function(user, topics) {
+    evtProxy.all([ findSessionUser, findTopics ], function(user, topics) {
       res.render('index', {
         title: config.SITE_NAME,
         user: user,
-        topics: topics || [],
+        topics: topics || []
       });
     });
 
     if (req.session.user) {
       User.findOne({
-        _id: req.session.user,
+        _id: req.session.user
       }, function(err, user) {
         evtProxy.emit(findSessionUser, user);
       });
@@ -36,7 +36,7 @@ class MainController {
       res.render('index', {
         title: config.SITE_NAME,
         user: null,
-        topics: [],
+        topics: []
       });
     }
   }
@@ -46,5 +46,5 @@ module.exports = {
   MainCtrl: MainController,
   SignCtrl: require('./sign.controller'),
   topicCtrl: require('./topic.controller'),
-  userCtrl: require('./user.controller'),
+  userCtrl: require('./user.controller')
 };

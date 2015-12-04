@@ -8,20 +8,20 @@ var UserSchema = new Schema({
   account: {
     type: String,
     required: true,
-    unique: true,
+    unique: true
   },
   hashedPassword: {
-    type: String,
+    type: String
   },
   openId: {
     type: String,
-    unique: true,
+    unique: true
   }, //第三方帐号登录的用户ID
 
   type: {
     required: true,
     type: Number, //1：注册用户，2：QQ用户，3：微博用户:4:github用户,5:微信
-    default: 1,
+    default: 1
   },
   isActive: {
     type: Boolean,
@@ -31,31 +31,31 @@ var UserSchema = new Schema({
     //用户积分
     score: {
       type: Number,
-      default: 0,
+      default: 0
     },
 
     //发贴数
     topicCount: {
       type: Number,
-      default: 0,
+      default: 0
     },
 
     //评论数
     commentCount: {
       type: Number,
-      default: 0,
+      default: 0
     },
 
     //精华文章数
     goodTopicCount: {
       type: Number,
-      default: 0,
-    },
+      default: 0
+    }
   },
   profile: {
     nickName: {
       type: String,
-      required: true,
+      required: true
     },
     realName: String,
     mobile: String,
@@ -74,23 +74,23 @@ var UserSchema = new Schema({
     address: String,
     website: String,
     birthday: Date,
-    description: String,
+    description: String
   },
 
   siteAdmin: {
     type: Boolean,
-    default: false,
+    default: false
   },
   lastOnline: {
     type: Date,
-    default: Date.now,
-  },
+    default: Date.now
+  }
 }, {
   versionKey: false,
   timestamps: {
     createdAt: 'createdAt',
-    updatedAt: 'updatedAt',
-  },
+    updatedAt: 'updatedAt'
+  }
 });
 
 UserSchema.statics.unique = function(query) {

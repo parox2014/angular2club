@@ -22,11 +22,24 @@
             var data=options.data||{};
             var method=options.method||'GET';
 
+            var noop=function () {
 
+            };
+
+            success=success||noop;
+            error=error||noop;
             xhr.open(method,options.url);
 
-            xhr.setRequestHeader('Content-Type','application/json');
-            xhr.setRequestHeader('X-Requested-With','XMLHttpRequest')
+            if(!(data instanceof FormData)){
+              xhr.setRequestHeader('Content-Type','application/json');
+              data=JSON.stringify(data);
+            }else{
+              //xhr.setRequestHeader('Content-Type','multipart/form-data')
+            }
+
+            xhr.setRequestHeader('X-Requested-With','XMLHttpRequest');
+
+
             xhr.addEventListener('readystatechange',function(e){
                 if(xhr.readyState===4){
                     if(xhr.status===200){
@@ -38,7 +51,19 @@
 
             });
 
-            xhr.send(JSON.stringify(data));
+            xhr.addEventListener('load',function (e) {
+              console.log(e);
+            });
+
+            xhr.addEventListener('error',function (e) {
+              console.error(e);
+            });
+
+            xhr.addEventListener('progress',function (event) {
+              console.log(event);
+            });
+
+            xhr.send(data);
         }
     </script>
 </head>

@@ -26,7 +26,8 @@ topicRouter.put(
   '/:topicId/top',
   auth.signinRequired,
   auth.adminRequired,
-  topicCtrl.toggleIsTop);
+  topicCtrl.toggleIsTop
+);
 
 //设为精华文章
 ////PUT /topics/:id/good
@@ -34,25 +35,36 @@ topicRouter.put(
   '/:topicId/good',
   auth.signinRequired,
   auth.adminRequired,
-  topicCtrl.toggleIsGood);
+  topicCtrl.toggleIsGood
+);
 
 //点赞
 //PUT /topics/:id/vote
 topicRouter.put(
   '/:topicId/vote',
   auth.signinRequired,
-  topicCtrl.toggleVote);
+  topicCtrl.toggleVote
+);
 
 //收藏
 topicRouter.put(
   '/:topicId/fav',
   auth.signinRequired,
-  topicCtrl.toggleFavorite);
+  topicCtrl.toggleFavorite
+);
 
 //获取收藏的topic
-topicRouter.get('/favs/mine', auth.signinRequired, topicCtrl.getFavoriteTopics);
+topicRouter.get(
+  '/favs/:id',
+  auth.signinRequired,
+  topicCtrl.getFavoriteTopics
+);
 
 //获取点赞的topic
-topicRouter.get('/votes/mine', auth.signinRequired, topicCtrl.getVoteTopics);
+topicRouter.get(
+  '/votes/:id',
+  auth.signinRequired,
+  topicCtrl.getVoteTopics
+);
 
 module.exports = topicRouter;

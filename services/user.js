@@ -13,6 +13,16 @@ class UserService {
   constructor() {
     throw new Error('not need instance');
   }
+  static getById(id) {
+    return new Promise(function(resolve, reject) {
+      User.findById(id,function (err,doc) {
+        if (err){
+          return reject(err);
+        }
+        resolve(doc);
+      });
+    });
+  }
   /**
    * 根据openid查询用户
    * @param openId {String}
@@ -24,7 +34,7 @@ class UserService {
 
     return new Promise((resolve, reject) => {
       User.findOne({
-          openId: openId,
+          openId: openId
         })
         .exec((err, doc) => {
           if (err) {
@@ -103,35 +113,35 @@ class UserService {
 
     return new Promise((resolve, reject) => {
       User.findOne({
-          account: account,
+          account: account
         })
-        .select('account nickName isActive hashedPassword')
+        .select('account profile.nickName isActive hashedPassword siteAdmin')
         .exec(function(err, user) {
 
           if (err) {
             err = {
               code: 500,
               result: false,
-              msg: err,
+              msg: err
             };
           } else if (!user) {
             err = {
               code: 404,
               result: false,
-              msg: 'user not found',
+              msg: 'user not found'
             };
 
           } else if (!user.isActive) {
             err = {
               code: 403,
               result: false,
-              msg: 'user is not actived',
+              msg: 'user is not actived'
             };
           } else if (Util.createHash(pwd) !== user.hashedPassword) {
             err = {
               code: 403,
               result: false,
-              msg: 'password incorrect',
+              msg: 'password incorrect'
             };
           }
 
@@ -164,20 +174,20 @@ class UserService {
             err = {
               code: 500,
               result: false,
-              msg: err,
+              msg: err
             };
           } else if (!user) {
 
             err = {
               code: 404,
               result: false,
-              msg: 'user not found',
+              msg: 'user not found'
             };
           } else if (user.get('isActive')) {
             err = {
               code: 403,
               result: false,
-              msg: 'user is actived',
+              msg: 'user is actived'
             };
           }
 
@@ -212,7 +222,7 @@ class UserService {
    */
   static updateByOpenId(openId, params, callback) {
     let query = {
-      openId: openId,
+      openId: openId
     };
     return User.findOneAndUpdate(query, params, callback);
   }
@@ -234,13 +244,13 @@ class UserService {
       proxy.on(events, function(doc) {
 
         let mailOption = {
-          to: doc.account,
+          to: doc.account
         };
 
         let data = {
           user: doc,
           config: config,
-          link: `http://test.angular2.club/users/${doc._id}/active`,
+          link: `http://test.angular2.club/users/${doc._id}/active`
         };
 
         mailClient
@@ -265,7 +275,7 @@ class UserService {
               err = {
                 code:404,
                 result:false,
-                msg:'user not found',
+                msg:'user not found'
               };
             }
 

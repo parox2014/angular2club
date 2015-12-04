@@ -6,54 +6,54 @@ const ObjectId = Schema.Types.ObjectId;
 const TopicSchema = new Schema({
   title: {
     type: String,
-    required: true,
+    required: true
   },
   content: {
     type: String,
-    required: true,
+    required: true
   },
   type: {
     type: Number,
-    required: true,
+    required: true
   },
   isTop: {
     type: Boolean,
-    default: false,
+    default: false
   }, // 置顶帖
   isGood: {
     type: Boolean,
-    default: false,
+    default: false
   }, // 精华帖
   isLock: {
     type: Boolean,
-    default: false,
+    default: false
   }, // 被锁定主题
   deleted: {
     type: Boolean,
-    default: false,
+    default: false
   },
   creator: {
     type: ObjectId,
     ref: 'User',
-    required: true,
+    required: true
   },
   lastComment: {
     type: ObjectId,
-    ref: 'Comment',
+    ref: 'Comment'
   },
   lastCommentAt: {
-    type: Date,
+    type: Date
   },
-  voters: [{
+  voters: [ {
     type: ObjectId,
-    ref: 'User',
-  },],
+    ref: 'User'
+  } ],
 
   //点赞的人
-  favers: [{
+  favers: [ {
     type: ObjectId,
-    ref: 'User',
-  },],
+    ref: 'User'
+  } ],
 
   //收藏的人
   comments: [],
@@ -61,42 +61,42 @@ const TopicSchema = new Schema({
     //点赞数
     votes: {
       type: Number,
-      default: 0,
+      default: 0
     },
 
     //收藏数
     favs: {
       type: Number,
-      default: 0,
+      default: 0
     },
 
     //访问数
     visits: {
       type: Number,
-      default: 0,
+      default: 0
     },
 
     //评论数
     comments: {
       type: Number,
-      default: 0,
-    },
-  },
+      default: 0
+    }
+  }
 }, {
   versionKey: false,
   timestamps: {
     createdAt: 'createdAt',
-    updatedAt: 'updatedAt',
-  },
+    updatedAt: 'updatedAt'
+  }
 });
 
 TopicSchema.index({
   isTop: -1,
-  lastCommentAt: -1,
+  lastCommentAt: -1
 });
 TopicSchema.index({
   creator: 1,
-  createdAt: -1,
+  createdAt: -1
 });
 
 TopicSchema.methods.isAuthor = function(userId) {
@@ -144,13 +144,13 @@ TopicSchema.statics.toggleVote = function(topicId, voteUser, vote) {
   let update = {};
 
   update[modifer] = {
-    voters: voteUser,
+    voters: voteUser
   };
   return new Promise((resolve, reject) => {
     this
       .update(update)
       .where({
-        _id: topicId,
+        _id: topicId
       })
       .exec((err) => {
         if (err) {
@@ -181,14 +181,14 @@ TopicSchema.statics.toggleFavorite = function(topicId, favUser, fav) {
   let update = {};
 
   update[modifer] = {
-    favers: favUser,
+    favers: favUser
   };
 
   return new Promise((resolve, reject) => {
     this
       .update(update)
       .where({
-        _id: topicId,
+        _id: topicId
       })
       .exec((err) => {
         if (err) {
@@ -218,7 +218,7 @@ TopicSchema.statics.getMyFavorites = function(sessionUser) {
 
   return new Promise((resolve, reject) => {
     this.find({
-        favers: sessionUser,
+        favers: sessionUser
       })
       .exec(function(err, doc) {
         if (err) {
@@ -235,10 +235,10 @@ TopicSchema.statics.updateLastComment = function(topicId, commentId) {
   return new Promise((resolve, reject) => {
     this.update({
         lastComment: commentId,
-        lastCommentAt: Date.now(),
+        lastCommentAt: Date.now()
       })
       .where({
-        _id: topicId,
+        _id: topicId
       })
       .exec(function(err, result) {
         if (err) {

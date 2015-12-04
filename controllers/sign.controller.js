@@ -31,7 +31,7 @@ class SignController {
    */
   static showSignup(req, res) {
     res.render('signup/signup', {
-      title: '注册',
+      title: '注册'
     });
   }
 
@@ -48,7 +48,7 @@ class SignController {
       res.render('signin/signin', {
         title: '登录',
         github: githubAuthClient.generateOAuthUri(githubAuthConfig.SCOPE),
-        qq: qqAuthClient.generateOAuthUri(),
+        qq: qqAuthClient.generateOAuthUri()
       });
     }
   }
@@ -91,7 +91,7 @@ class SignController {
     if (mapErrors) {
       return res.status(403).send({
         result: false,
-        msg: mapErrors,
+        msg: mapErrors
       });
     }
 
@@ -99,8 +99,8 @@ class SignController {
       account: req.body.account,
       hashedPassword: Util.createHash(req.body.password),
       profile: {
-        nickName: req.body.nickName,
-      },
+        nickName: req.body.nickName
+      }
     };
 
     User
@@ -114,7 +114,7 @@ class SignController {
       if (exist) {
         res.responseError({
           result: false,
-          msg: 'accout is exist',
+          msg: 'accout is exist'
         });
         return;
       }
@@ -149,7 +149,7 @@ class SignController {
       .then(function(info) {
         res.send({
           result:true,
-          msg:'send mail Success',
+          msg:'send mail Success'
         });
         logger.debug(info);
       }, function(err)  {
@@ -192,7 +192,7 @@ class SignController {
     if (mapErrors) {
       return res.status(403).send({
         result: false,
-        msg: mapErrors,
+        msg: mapErrors
       });
     }
 
@@ -239,7 +239,7 @@ class SignController {
     if (!qqAuthClient.validateState(req.query.state)) {
       return res.status(403).send({
         result: false,
-        msg: 'state is incorrect',
+        msg: 'state is incorrect'
       });
     }
 
@@ -271,15 +271,15 @@ class SignController {
             gender: config.genderType[qqUser.gender],
             avatar: qqUser.figureurl_qq_1,
             province: qqUser.province,
-            city: qqUser.city,
-          },
+            city: qqUser.city
+          }
         };
 
         //如果用户已经存在，就更新用户资料
         //如果用户不存在，就创建用户
         if (isExist) {
           return User.updateByOpenId(openId, {
-            profile: account.profile,
+            profile: account.profile
           });
 
           //return user.save();
@@ -299,7 +299,7 @@ class SignController {
         res.status(err.code).render('error', {
           title: err.msg,
           message: err.msg,
-          error: err,
+          error: err
         });
       });
 
@@ -319,7 +319,7 @@ class SignController {
     if (!githubAuthClient.validateState(req.query.state)) {
       return res.status(403).send({
         result: false,
-        msg: 'state is incorrect',
+        msg: 'state is incorrect'
       });
     }
 
@@ -345,8 +345,8 @@ class SignController {
             nickName: githubUserInfo.login,
             avatar: githubUserInfo.avatar_url,
             website: githubUserInfo.html_url,
-            github: githubUserInfo.email,
-          },
+            github: githubUserInfo.email
+          }
         };
 
         if (isExist) {

@@ -31,3 +31,6 @@ node_modules
 
 #VS code
 .vscode
+
+#upload folder
+uploads

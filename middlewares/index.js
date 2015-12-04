@@ -15,7 +15,7 @@ express.response.__proto__.responseError = function(err) {
   this.render('error', {
     title: err.msg,
     message: err.msg,
-    error: err,
+    error: err
   });
 };
 
@@ -26,24 +26,25 @@ express.request.__proto__.generateSession = function(user, callback) {
 
   return new Promise((resolve, reject) => {
 
-    req.session.regenerate(() => {
+    req.session.regenerate(function() {
+
       req.session.user = user._id;
       req.session.account = user.account;
-      req.session.nickName = user.nickName;
+      req.session.nickName = user.profile.nickName;
       req.session.siteAdmin = user.siteAdmin;
-      req.session.msg = 'Authenticated as ' + user.nickName;
+      req.session.msg = 'Authenticated as ' + user.profile.nickName;
 
       user.set('lastOnline', Date.now());
 
-      user.save(function(err) {
+      user.save(function(err,doc) {
         if (err) {
           reject(err);
           callback(err, undefined);
           return;
         }
 
-        resolve(user);
-        callback(undefined, user);
+        resolve(doc);
+        callback(undefined, doc);
       });
 
     });
@@ -55,9 +56,9 @@ exports.signinRequired = function(req, res, next) {
     next();
   } else {
     if (req.xhr) {
-      res.set('X-Error', 'signin required');
-      res.status(403).send({
-        msg: 'signin required',
+      res.responseError({
+        code:401,
+        msg: 'signin required'
       });
     } else {
       res.redirect('/signin');
@@ -66,14 +67,15 @@ exports.signinRequired = function(req, res, next) {
 };
 
 exports.adminRequired = function(req, res, next) {
+  logger.debug(req.session);
   if (req.session.siteAdmin) {
     next();
   } else {
     logger.warn('需要管理员权限');
     if (req.xhr) {
-      res.set('X-Error', 'admin required');
-      res.status(403).send({
-        msg: 'admin required',
+      res.responseError({
+        code:401,
+        msg: 'admin required'
       });
     } else {
       res.redirect('/');

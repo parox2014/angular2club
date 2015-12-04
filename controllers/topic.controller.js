@@ -7,7 +7,7 @@ const User = require('../models').User;
 const _ = require('underscore');
 const util = require('../util');
 const mongoose = require('mongoose');
-const props = ['title', 'content', 'type'];
+const props = [ 'title', 'content', 'type' ];
 
 exports.createTopic = function(req, res) {
 
@@ -21,7 +21,7 @@ exports.createTopic = function(req, res) {
   if (mapErrors) {
     return res.status(403).send({
       result: false,
-      msg: mapErrors,
+      msg: mapErrors
     });
   }
 
@@ -54,7 +54,6 @@ exports.getTopicList = function(req, res) {
     });
 };
 
-let express = require('express');
 exports.updateTopic = function(req, res) {
   let topicId = req.params.topicId;
   let sessionUser = req.session.user;
@@ -100,63 +99,51 @@ exports.getTopicDetail = function(req, res) {
 exports.getFavoriteTopics = function(req, res) {
 
   let sessionUser = req.session.user;
-
-  Topic.getMyFavorites(sessionUser)
-    .then(function(docs) {
+  Topic.getFavoriteTopicsByUserId(sessionUser)
+    .then(docs=>{
       res.json(docs);
-    }, function(err) {
-
-      res.status(500).send({
-        msg: err,
-      });
+    })
+    .catch(err=>{
+      logger.err(err);
+      res.responseError(err);
     });
 
 };
 
 exports.getVoteTopics = function(req, res) {
   let sessionUser = req.session.user;
-
-  Topic
-    .find({
-      voters: sessionUser,
-    })
-    .exec(function(err, docs) {
-      if (err) {
-        return res.status(500).send({
-          msg: err,
-        });
-      }
-
+  Topic.getVoteTopicsByUserId(sessionUser)
+    .then(docs=>{
       res.json(docs);
+    })
+    .catch(err=>{
+      logger.err(err);
+      res.responseError(err);
     });
 };
 
 exports.toggleIsTop = function(req, res) {
   let topicId = req.params.topicId;
 
-  Topic.toggleIsTop(topicId, function(err, topic) {
-    if (err) {
-      return res.status(500).send({
-        msg: err,
-      });
-    }
-
-    res.json(topic);
-  });
+  Topic.toggleIsTop(topicId)
+    .then(doc=>{
+      res.json(doc);
+    })
+    .catch(err=>{
+      res.responseError(err);
+    });
 };
 
 exports.toggleIsGood = function(req, res) {
   let topicId = req.params.topicId;
 
-  Topic.toggleIsGood(topicId, function(err, topic) {
-    if (err) {
-      return res.status(500).send({
-        msg: err,
-      });
-    }
-
-    res.json(topic);
-  });
+  Topic.toggleIsGood(topicId)
+    .then(doc=>{
+      res.json(doc);
+    })
+    .catch(err=>{
+      res.responseError(err);
+    });
 };
 
 exports.toggleVote = function(req, res) {
@@ -165,13 +152,12 @@ exports.toggleVote = function(req, res) {
 
   Topic
     .toggleVote(topicId, req.session.user, vote)
-    .then(function(doc) {
+    .then(doc=> {
       res.json(doc);
-    }, function(err) {
-
-      return res.status(500).send({
-        msg: err,
-      });
+    })
+    .catch(err=>{
+      logger.error(err);
+      res.responseError(err);
     });
 };
 
@@ -181,12 +167,10 @@ exports.toggleFavorite = function(req, res) {
 
   Topic
     .toggleFavorite(topicId, req.session.user, fav)
-    .then(function(doc) {
+    .then(doc=> {
       res.json(doc);
-    }, function(err) {
-
-      return res.status(500).send({
-        msg: err,
-      });
+    })
+    .catch(err=>{
+      res.responseError(err);
     });
 };

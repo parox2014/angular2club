@@ -1,8 +1,7 @@
 'use strict';
 
-const User = require('../models').User;
 const util = require('../util');
-const userService = require('../services').User;
+const User = require('../services').User;
 
 const config = require('../config');
 
@@ -19,21 +18,21 @@ class UserController {
     User.unique(req.query)
       .then(function(isExist) {
         if (isExist) {
-          var msg = 'ACCOUNT_IS_EXIST';
-          res.set('X-Error', msg);
-          res.status(403).send({
-            msg: msg,
+          res.responseError({
+            code:403,
+            msg:'account is exist'
           });
         } else {
           res.json({
             result: true,
-            msg: 'ACCOUNT_IS_NOT_EXIST',
+            msg: 'account is not exist'
           });
         }
       }, function(err) {
 
-        res.status(403).send({
-          msg: err,
+        res.responseError({
+          code:403,
+          msg:err
         });
       });
   }
@@ -48,7 +47,7 @@ class UserController {
 
     userService.active(userid, function(err, user) {
       if (err) {
-        return res.status(err.code).send(err);
+        return res.responseError(err);
       }
 
       res.json(user);
@@ -69,15 +68,15 @@ class UserController {
       .findByIdAndUpdate(
         req.session.user, {
           $set: {
-            profile: update,
-          },
+            profile: update
+          }
         }
       )
       .exec(function(err, result) {
         if (err) {
           res.status(500).send({
             result: false,
-            msg: err,
+            msg: err
           });
         } else {
           res.json(result);
@@ -93,19 +92,12 @@ class UserController {
   static getUserProfile(req, res) {
     var uid = req.params.id;
 
-    User.findOne({
-        _id: uid,
+    User.getById(uid)
+      .then(doc=>{
+        res.json(doc);
       })
-      .populate('topics', 'title content')
-      .exec(function(err, user) {
-        if (err) {
-          res.status(500).send({
-            result: false,
-            msg: err,
-          });
-        } else {
-          res.json(user);
-        }
+      .catch(err=>{
+        res.responseError(err);
       });
   }
 }

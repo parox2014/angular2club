@@ -30,22 +30,38 @@
 
 <%include ../common/scripts.ejs%>
 <script>
-    document.querySelector('#loginForm')
-            .addEventListener('submit',function(e){
-                var parmas={
-                    account:document.querySelector('[name="account"]').value,
-                    password:document.querySelector('[name="password"]').value
-                };
+  (function () {
+    var loginForm=document.querySelector('#loginForm');
 
-                e.preventDefault();
-                sendAjax({
-                    url:'/signin',
-                    method:'POST',
-                    data:parmas
-                },function(resp){
-                    console.log(resp);
-                });
-            });
+    loginForm.addEventListener('submit',onSubmit);
+
+    function onSubmit(e){
+      e.preventDefault();
+
+      var data={
+        account:this.account.value,
+        password:this.password.value
+      }
+
+      sendAjax({
+          url:'/signin',
+          method:'POST',
+          data:data
+      },function(resp){
+          console.log(resp);
+      });
+      sendAjax({
+          url:'/test/post',
+          method:'POST',
+          data:new FormData(this)
+      },function(resp){
+          console.log(resp);
+      });
+    }
+  })();
+
+
+
 </script>
 </body>
 <%include ../common/footer.ejs%>
