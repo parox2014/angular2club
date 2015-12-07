@@ -1,5 +1,5 @@
 'use strict';
-
+//require('tingyun');
 const log4js = require('log4js');
 global.logger = log4js.getLogger();
 global.noop = function() {};
@@ -24,7 +24,7 @@ server.set('view engine', config.VIEW_ENGINE);
 
 server.use(bodyParser.json());
 server.use(bodyParser.urlencoded({
-  extended: false,
+  extended: false
 }));
 
 server.use(expressValidator());
@@ -40,11 +40,11 @@ server.use(session({
   resave: false,
   saveUninitialized: true,
   cookie: {
-    maxAge: config.COOKIE_MAX_AGE,
+    maxAge: config.COOKIE_MAX_AGE
   },
   store: new MongoStore({
-    mongooseConnection: mongoose.connection,
-  }),
+    mongooseConnection: mongoose.connection
+  })
 }));
 
 /*server.use(middleware.handleError);
@@ -76,7 +76,7 @@ if (server.get('env') === 'development') {
     res.render('error', {
       title: err.message,
       message: err.message,
-      error: err,
+      error: err
     });
   });
 
@@ -87,7 +87,7 @@ server.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error', {
     message: err.message,
-    error: {},
+    error: {}
   });
 });
 

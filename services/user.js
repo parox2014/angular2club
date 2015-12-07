@@ -52,9 +52,9 @@ class UserService {
   /**
    * 验证用户的唯一性
    * @param  {String}   value       [需验证的值]
-   * @param  {[String]}   uniqueField [需验证的字段]
+   * @param  {String}   uniqueField [需验证的字段]
    * @param  {Function} callback    [回调]
-   * @return {[Promise]}               [返回promise]
+   * @return {Promise}               [返回promise]
    */
   static unique(value, uniqueField, callback) {
     if (!uniqueField) {

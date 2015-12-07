@@ -20,6 +20,7 @@ const config = {
     SESSION_SECRET:'angular2club',
     COOKIE_MAX_AGE:60 * 60 * 1000,
     ONEAPM_KEY:'UFYEBAIDBQleb32RFVxFWlRKWx0270AOXx4CAgYFSd920QkLHQQLSgdU68f5UwYfAAoaA1Q=',
+    TINGYUN_KEY:'6dc7580b1ba0e2533fe16c5541175777',
     mail:{
         HOST: 'smtp.163.com',
         PORT: 25,

@@ -9,13 +9,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.3/css/materialize.min.css">
     <script>
         //百度统计
-        var _hmt = _hmt || [];
+        /*var _hmt = _hmt || [];
         (function() {
             var hm = document.createElement("script");
             hm.src = "//hm.baidu.com/hm.js?562c791c0f745a6bc710f8f06d49f321";
             var s = document.getElementsByTagName("script")[0];
             s.parentNode.insertBefore(hm, s);
-        })();
+        })();*/
 
         function sendAjax(options,success,error){
             var xhr=new XMLHttpRequest();
@@ -39,29 +39,14 @@
 
             xhr.setRequestHeader('X-Requested-With','XMLHttpRequest');
 
-
-            xhr.addEventListener('readystatechange',function(e){
-                if(xhr.readyState===4){
-                    if(xhr.status===200){
-                        success(xhr.responseText);
-                    }else{
-                        error(xhr.status,xhr.statusText);
-                    }
-                }
-
-            });
-
             xhr.addEventListener('load',function (e) {
-              console.log(e);
+              success(xhr.responseText,xhr);
             });
 
             xhr.addEventListener('error',function (e) {
-              console.error(e);
+              error(xhr.status,xhr.statusText,xhr);
             });
 
-            xhr.addEventListener('progress',function (event) {
-              console.log(event);
-            });
 
             xhr.send(data);
         }
