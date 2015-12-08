@@ -46,5 +46,6 @@ module.exports = {
   MainCtrl: MainController,
   SignCtrl: require('./sign.controller'),
   topicCtrl: require('./topic.controller'),
-  userCtrl: require('./user.controller')
+  userCtrl: require('./user.controller'),
+  CommentCtrl:require('./comment.controller')
 };

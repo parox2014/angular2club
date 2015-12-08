@@ -10,9 +10,12 @@ const mailClient = new Mail('./views/mail/mail-active.ejs');
 const EventProxy = require('eventproxy');
 
 class UserService {
-  constructor() {
-    throw new Error('not need instance');
-  }
+  /**
+   * get user by id
+   * @method getById
+   * @param  {[type]} id [description]
+   * @return {[type]}    [description]
+   */
   static getById(id) {
     return new Promise(function(resolve, reject) {
       User.findById(id,function (err,doc) {
@@ -227,6 +230,31 @@ class UserService {
     return User.findOneAndUpdate(query, params, callback);
   }
 
+  /**
+   * 更新用户资料
+   * @method updateProfile
+   * @param  {[type]}      sessionUser [description]
+   * @param  {[type]}      profile     [description]
+   * @return {[type]}                  [description]
+   */
+  static updateProfile(sessionUser,profile) {
+    return new Promise(function(resolve, reject) {
+      User.findByIdAndUpdate(
+        sessionUser,
+        {
+          $set:{
+            profile:profile
+          }
+        }
+      )
+      .exec((err,doc)=>{
+        if (err){
+          return reject(err);
+        }
+        resolve(doc);
+      });
+    });
+  }
   /**
    * 给用户发送邮件
    * @method sendMailToUser

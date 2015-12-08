@@ -205,7 +205,7 @@ class SignController {
         res.json(data);
       })
       .catch(err => {
-        res.status(err.code).send(err);
+        res.responseError(err);
       });
   }
 

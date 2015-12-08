@@ -23,11 +23,9 @@ express.request.__proto__.generateSession = function(user, callback) {
   let req = this;
 
   callback = callback || noop;
-
   return new Promise((resolve, reject) => {
 
     req.session.regenerate(function() {
-
       req.session.user = user._id;
       req.session.account = user.account;
       req.session.nickName = user.profile.nickName;
@@ -35,7 +33,7 @@ express.request.__proto__.generateSession = function(user, callback) {
       req.session.msg = 'Authenticated as ' + user.profile.nickName;
 
       user.set('lastOnline', Date.now());
-
+      logger.debug(user);
       user.save(function(err,doc) {
         if (err) {
           reject(err);

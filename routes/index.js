@@ -4,6 +4,7 @@ var ctrls = require('../controllers');
 var SignCtrl = ctrls.SignCtrl;
 var userRouter = require('./user.route');
 var topicRouter = require('./topic.route');
+const commentRouter = require('./comment.route');
 
 module.exports = function(server) {
   //渲染主页页
@@ -35,4 +36,6 @@ module.exports = function(server) {
   server.use('/users', userRouter);
 
   server.use('/topics', topicRouter);
+
+  server.use('/comments',commentRouter);
 };

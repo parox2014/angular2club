@@ -24,7 +24,7 @@ class QQOAuth2 extends OAuth2 {
       PATH_ACCESS_TOKEN: '/oauth2.0/token?',
       PATH_OPEN_ID: '/oauth2.0/me?',
       PATH_GET_USER_INFO: '/user/get_user_info?',
-      OAUTH_URI: 'https://graph.qq.com/oauth2.0/authorize?',
+      OAUTH_URI: 'https://graph.qq.com/oauth2.0/authorize?'
     };
 
     this._requestOptions.hostname = this._config.HOST_NAME;
@@ -38,11 +38,11 @@ class QQOAuth2 extends OAuth2 {
    */
   getOpenId(token) {
       let params = {
-        access_token: token,
+        access_token: token
       };
 
       let options = Object.assign({
-        path: this._config.PATH_OPEN_ID + querystring.stringify(params),
+        path: this._config.PATH_OPEN_ID + querystring.stringify(params)
       }, this._requestOptions);
 
       return new Promise((resolve, reject) => {
@@ -65,12 +65,12 @@ class QQOAuth2 extends OAuth2 {
     let params = {
       access_token: token,
       openid: openId,
-      oauth_consumer_key: this._appId,
+      oauth_consumer_key: this._appId
     };
 
     let options = Object.assign({
       path: this._config.PATH_GET_USER_INFO + querystring.stringify(
-        params),
+        params)
     }, this._requestOptions);
 
     return new Promise((resolve, reject) => {

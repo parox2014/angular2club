@@ -7,4 +7,5 @@ module.exports = {
   Topic:require('./topic'),
   Mail: require('./mail'),
   User: require('./user'),
+  Comment:require('./comment')
 };

@@ -76,9 +76,10 @@ const config = {
     },
     //用户加分项目
     score:{
-        TOPIC:10,//发贴
-        COMMENT:2,//评论
-        GOOD:10//精华
+        TOPIC:10,//发贴加分
+        COMMENT:2,//评论加分
+        GOOD:10,//精华加分
+        VOTE:1//被赞,无论是topic还是comment被赞，都加分
     },
     //消息类型,1:回复您的贴子,2:回复评论,3:@ at您
     messageType:{

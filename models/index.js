@@ -2,8 +2,10 @@
 const mongoose = require('mongoose');
 const config = require('../config');
 
+mongoose.Promise = global.Promise;
+
 mongoose.connect(config.DATABASE, {
-  poolSize: 20,
+  poolSize: 20
 }, function(err) {
   if (!err) {
     logger.info('database connect success');

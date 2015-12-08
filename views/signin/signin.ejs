@@ -48,15 +48,10 @@
           method:'POST',
           data:data
       },function(resp){
+        window.location.href='/';
           console.log(resp);
-      });
-      sendAjax({
-          url:'/test/post',
-          method:'POST',
-          data:new FormData(this)
-      },function(resp){
-          console.log(resp);
-          window.location.href='/';
+      },function (err) {
+        console.error(err);
       });
     }
   })();

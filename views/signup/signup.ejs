@@ -2,7 +2,7 @@
 <body>
 
 <div>
-    <form id="signinForm">
+    <form id="signupForm">
         <div>
             <input name="account" type="email">
         </div>
@@ -21,7 +21,7 @@
 
 <%include ../common/scripts.ejs%>
 <script>
-    document.querySelector('#signinForm')
+    document.querySelector('#signupForm')
             .addEventListener('submit',function(e){
                 e.preventDefault();
 
@@ -37,8 +37,10 @@
                     method:'POST',
                     data:parmas
                 },function(resp){
-                    alert('注册成功,请前往邮箱激活帐号');
-                    console.log(resp);
+                  alert('注册成功,请前往邮箱激活帐号');
+                  console.log(resp);
+                },function (err) {
+                  console.error(err);
                 });
             });
 </script>

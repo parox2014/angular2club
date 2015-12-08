@@ -40,7 +40,12 @@
             xhr.setRequestHeader('X-Requested-With','XMLHttpRequest');
 
             xhr.addEventListener('load',function (e) {
-              success(xhr.responseText,xhr);
+              var status=xhr.status;
+              if(status>=200&&status<300){
+                success(xhr.responseText);
+              }else{
+                error(status,xhr.statusText,xhr);
+              }
             });
 
             xhr.addEventListener('error',function (e) {

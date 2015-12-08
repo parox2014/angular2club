@@ -13,8 +13,6 @@ class UserController {
    * @param res
    */
   static unique(req, res) {
-
-    logger.debug(req.query);
     User.unique(req.query)
       .then(function(isExist) {
         if (isExist) {
@@ -45,7 +43,7 @@ class UserController {
   static active(req, res) {
     let userid = req.params.id;
 
-    userService.active(userid, function(err, user) {
+    User.active(userid, function(err, user) {
       if (err) {
         return res.responseError(err);
       }
@@ -64,23 +62,12 @@ class UserController {
 
     var update = Object.assign({}, reqBody);
 
-    User
-      .findByIdAndUpdate(
-        req.session.user, {
-          $set: {
-            profile: update
-          }
-        }
-      )
-      .exec(function(err, result) {
-        if (err) {
-          res.status(500).send({
-            result: false,
-            msg: err
-          });
-        } else {
-          res.json(result);
-        }
+    User.updateProfile(req.session.user,update)
+      .then(doc=>{
+        res.json(doc);
+      })
+      .catch(err=>{
+        res.responseError(err);
       });
   }
 
