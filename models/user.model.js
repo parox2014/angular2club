@@ -13,10 +13,7 @@ var UserSchema = new Schema({
   hashedPassword: {
     type: String
   },
-  openId: {
-    type: String,
-    unique: true
-  }, //第三方帐号登录的用户ID
+  openId: String, //第三方帐号登录的用户ID
 
   type: {
     required: true,

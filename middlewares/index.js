@@ -20,6 +20,7 @@ express.response.__proto__.responseError = function(err) {
 };
 
 express.request.__proto__.generateSession = function(user, callback) {
+
   let req = this;
 
   callback = callback || noop;

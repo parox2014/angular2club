@@ -18,7 +18,7 @@ var CommentSchema = new Schema({
     type:ObjectId,
     ref:'User'
   },
-
+  mentions:[ { type:ObjectId,ref:'User' } ],
   //创建者
   creator: {
     type: ObjectId,

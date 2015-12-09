@@ -89,9 +89,9 @@ class SignController {
 
     //如果存在错误，则向客户端返回错误
     if (mapErrors) {
-      return res.status(403).send({
-        result: false,
-        msg: mapErrors
+      return res.responseError({
+        code:403,
+        msg:mapErrors
       });
     }
 
@@ -106,14 +106,14 @@ class SignController {
     User
 
     //验证帐号是否已经存在
-      .unique(param.account)
+    .unique(param.account)
 
     //如果不存在，则创建用户
     .then(exist => {
-      logger.debug(exist);
+
       if (exist) {
         res.responseError({
-          result: false,
+          code:400,
           msg: 'accout is exist'
         });
         return;
@@ -137,8 +137,11 @@ class SignController {
 
     //捕捉错误
     .catch(err => {
-      logger.debug('Send Email Failed:', info.response);
-      res.status(err.code || 500).send(err);
+      logger.error(err);
+
+      if (res.headersSent)return;
+
+      res.responseError(err);
     });
   }
 

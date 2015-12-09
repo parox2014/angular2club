@@ -1,6 +1,7 @@
 'use strict';
 
-const Comment = require('../services').Comment;
+const services = require('../services');
+const Comment = services.Comment;
 
 class CommentController {
 
@@ -26,6 +27,7 @@ class CommentController {
 				res.json(result);
 			})
 			.catch(err=>{
+				logger.error(err);
 				res.responseError(err);
 			});
 	}
@@ -39,6 +41,10 @@ class CommentController {
 			.catch(err=>{
 				res.responseError(err);
 			});
+	}
+
+	static removeComment(req,res) {
+
 	}
 	static updateComment(req,res) {
 		Comment.update();
