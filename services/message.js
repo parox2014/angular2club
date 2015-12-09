@@ -34,8 +34,8 @@ class MessageService {
 		return Message.findOneAndUpdate({ _id:id,to:sessionUser },{ isReaded:true });
 	}
 
-	static removeReaded(sessionUser){
-		return Message.findAndRemove({isReaded:true,to:sessionUser});
+	static removeReaded(sessionUser) {
+		return Message.findAndRemove({ isReaded:true,to:sessionUser });
 	}
 }
 
