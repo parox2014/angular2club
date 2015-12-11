@@ -1,0 +1,54 @@
+<form name="registerForm"
+            ng-submit="onSubmit()"
+            >
+    <md-input-container>
+        <h3 class="mdl-text-center" ng-bind="formTitle"></h3>
+    </md-input-container>
+    <md-input-container md-no-float class="md-block">
+        <md-icon md-icon="material-icons">email</md-icon>
+        <input ng-model="user.account"
+            name="account"
+            type="email"
+            unique="account"
+            placeholder="{{ 'EMAIL'|translate }}"
+               aria-label="email"
+            required>
+    </md-input-container>
+
+    <md-input-container md-no-float class="md-block">
+        <md-icon md-icon="material-icons">person</md-icon>
+        <input ng-model="user.nickName"
+            name="nickName"
+            type="text"
+            placeholder="{{ 'NICK_NAME'|translate }}"
+            ng-minlength="2"
+            ng-maxlength="20"
+               aria-label="nickname"
+            required>
+        </div>
+    </md-input-container>
+
+    <md-input-container md-no-float class="md-block">
+        <md-icon md-icon="material-icons">lock</md-icon>
+        <input ng-model="user.password"
+            name="password"
+            type="password"
+            ng-minlength="6"
+            ng-maxlength="20"
+            placeholder="{{ 'PASSWORD'|translate }}"
+               aria-label="password"
+            required>
+    </md-input-container>
+
+    <md-input-container md-no-float class="md-block">
+        <md-button type="submit" flex="100"
+            class="md-primary md-raised"
+            ng-disabled="registerForm.$invalid||vm.isSubmiting"
+            ng-bind="'REGISTER_BUTTON_TEXT'|translate">
+        </md-button>
+    </md-input-container>
+
+    <md-input-container>
+        <md-button href="/signin">{{ 'ALREADY_HAVE_AN_ACCOUNT'|translate }}?{{ 'LOGIN_BUTTON_TEXT'|translate }}</md-button>
+    </md-input-container>
+</form>

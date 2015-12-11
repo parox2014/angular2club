@@ -13,7 +13,8 @@ var MessageSchema = new Schema({
   //消息发送者
   from: {
     type: ObjectId,
-    required: true
+    required: true,
+    ref:'User'
   },
 
   //消息接收者

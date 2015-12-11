@@ -1,0 +1,30 @@
+<md-sidenav md-component-id="leftMenu" class="md-sidenav-left md-whiteframe-2dp">
+    <h5 class="mdl-pd-hor-2x" ng-bind="currentUser.nickName"></h5>
+    <md-menu-content>
+        <md-menu-item>
+            <md-button href="#">
+                <md-icon class="material-icons">settings</md-icon>
+                {{'SETTINGS'|translate}}
+            </md-button>
+        </md-menu-item>
+        <md-menu-item>
+            <md-button href="#profile">
+                <md-icon class="material-icons">archive</md-icon>
+                {{'PROFILE'|translate}}
+            </md-button>
+        </md-menu-item>
+        <md-menu-item>
+            <md-button href="#help">
+                <md-icon class="material-icons">help</md-icon>
+                {{'HELP'|translate}}
+            </md-button>
+        </md-menu-item>
+        <md-menu-item>
+            <md-button href="/signout" class="md-warn">
+                <md-icon class="material-icons">power_settings_new</md-icon>
+                {{'SIGNOUT'|translate}}
+            </md-button>
+        </md-menu-item>
+    </md-menu-content>
+
+</md-sidenav>

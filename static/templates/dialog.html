@@ -1,0 +1,28 @@
+<md-dialog aria-label="dialog">
+    <md-toolbar class="{{'md-'+config.type}}" ng-if="config.showToolbar">
+        <div class="md-toolbar-tools">
+            <h6 ng-bind="config.title"></h6>
+            <span flex></span>
+            <md-button class="md-icon-button" ng-click="closeDialog()">
+                <md-icon class="material-icons">close</md-icon>
+            </md-button>
+        </div>
+    </md-toolbar>
+    <md-dialog-content>
+        <p ng-bind-html="config.template">
+        </p>
+    </md-dialog-content>
+    <div class="md-actions">
+        <md-button ng-click="closeDialog()"
+            aria-label="{{config.cancelText}}"
+            ng-if="config.showCancelButton"
+            ng-bind="config.cancelText">
+        </md-button>
+        <md-button ng-click="onConfirm()"
+            ng-if="config.showOkButton"
+            class="md-raised {{'md-'+config.type}}"
+            aria-label="{{config.okText}}"
+            ng-bind="config.okText">
+        </md-button>
+    </div>
+</md-dialog>

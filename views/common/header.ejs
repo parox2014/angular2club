@@ -2,58 +2,12 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
     <title><%=title%></title>
     <link rel="shortcut icon" href="./images/favicon.ico"/>
     <meta property="qc:admins" content="55136337775412263452"/>
     <meta property="wb:webmaster" content="ce2ab36ebe433e44" />
-    <link rel="stylesheet" href="./css/materialize.min.css">
-    <script>
-        //百度统计
-        /*var _hmt = _hmt || [];
-        (function() {
-            var hm = document.createElement("script");
-            hm.src = "//hm.baidu.com/hm.js?562c791c0f745a6bc710f8f06d49f321";
-            var s = document.getElementsByTagName("script")[0];
-            s.parentNode.insertBefore(hm, s);
-        })();*/
-
-        function sendAjax(options,success,error){
-            var xhr=new XMLHttpRequest();
-            var data=options.data||{};
-            var method=options.method||'GET';
-
-            var noop=function () {
-
-            };
-
-            success=success||noop;
-            error=error||noop;
-            xhr.open(method,options.url);
-
-            if(!(data instanceof FormData)){
-              xhr.setRequestHeader('Content-Type','application/json');
-              data=JSON.stringify(data);
-            }else{
-              //xhr.setRequestHeader('Content-Type','multipart/form-data')
-            }
-
-            xhr.setRequestHeader('X-Requested-With','XMLHttpRequest');
-
-            xhr.addEventListener('load',function (e) {
-              var status=xhr.status;
-              if(status>=200&&status<300){
-                success(xhr.responseText);
-              }else{
-                error(status,xhr.statusText,xhr);
-              }
-            });
-
-            xhr.addEventListener('error',function (e) {
-              error(xhr.status,xhr.statusText,xhr);
-            });
-
-
-            xhr.send(data);
-        }
-    </script>
+    <link rel="stylesheet" href="./css/material.min.css">
+    <link rel="stylesheet" href="./css/style.css">
 </head>

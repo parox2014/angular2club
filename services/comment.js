@@ -24,9 +24,9 @@ class CommentService {
 			let mentions = comment.get('mentions');
 			//1.添加评论
 			//2.评论创建者加分
-			//3.TODO 给文章创建者发送消息
-			//4.TODO 如果存在回复的人，则给此人发通知
-			//5.TODO 如果存在@的人，则给@的人发通知
+			//3. 给文章创建者发送消息
+			//4. 如果存在回复的人，则给此人发通知
+			//5. 如果存在@的人，则给@的人发通知
 
 			Topic.findById(topicId)
 				.exec((err,doc)=>{
@@ -42,7 +42,7 @@ class CommentService {
 							data:comment
 						});
 					}
-					/**/
+
 					let p1 = comment.save();
 					let p2 = User.update({
 						$inc:{
@@ -56,51 +56,66 @@ class CommentService {
 
 					Promise.all([ p1,p2 ])
 						.then(args=>{
+
 							resolve(args[0]);
 						})
 						.catch(err=>{
 							reject(err);
 						});
 
+					//更新主题的最后评论及最后评论时间，并增加评论数
+					Topic.update({
+						$set:{
+							lastComment:comment.get('_id'),
+							lastCommentAt:Date.now()
+						},
+						$inc:{
+							'meta.comments':1
+						}
+					})
+					.where('_id')
+					.equals(topicId)
+					.exec((err,result)=>{
+						if (err){
+							return logger.error(err);
+						}
+						logger.info(result);
+					});
+
+					let promises = [];
 					//发送消息给文章创建者
-					Message.send(user,doc.creator,{
+					let p3 = Message.send(user,doc.creator,{
 						type:config.messageType.REPLY_TOPIC,
 						topicId:topicId
-					})
-					.then(doc=>{
-						logger.info('send message to topic creator success',doc);
-					})
-					.catch(err=>{
-						logger.error(err);
 					});
+
+					promises.push(p3);
 
 					//发送消息给回复的人
 					if (replyTo){
-						Message.send(user,replyTo,{
+						let p4 = Message.send(user,replyTo,{
 							type:config.messageType.REPLY_COMMENT,
 							topicId
-						})
-						.then(doc=>{
-							logger.info('send message to replyTo success',doc);
-						})
-						.catch(err=>{
-							logger.error(err);
 						});
+						promises.push(p4);
 					}
 
 					//发送消息给提及的人
 					if (Array.isArray(mentions)&&mentions.length>0){
-						Message.send(user,mentions,{
+						let p5 = Message.send(user,mentions,{
 							type:config.messageType.AT,
 							topicId:topicId
-						})
-						.then(doc=>{
-							logger.info('send message to mentions success',doc);
+						});
+						promises.push(p5);
+					}
+
+					Promise.all(promises)
+						.then(results=>{
+							logger.info('send message success');
 						})
 						.catch(err=>{
 							logger.error(err);
 						});
-					}
 				});
 		});
 	}
@@ -112,26 +127,60 @@ class CommentService {
 	}
 
 	static update(commentId,creator,update) {
-		return Comment.findByIdAndUpdate(commentId,update).exec();
-	}
 
-	static getById(commentId) {
-		return Comment.findByid(commentId);
-	}
-
-	static removeById(commentId) {
 		return new Promise(function(resolve, reject) {
-			Comment.findById(commentId)
+			Comment
+				.findOneAndUpdate(
+					{ _id:commentId,creator:creator },
+					update
+				).exec((err,doc)=>{
+					if (err){
+						return reject(err);
+					}
+
+					if (!doc){
+						return reject({
+							code:404,
+							msg:'comment not found or you are not the author of this comment'
+						});
+					}
+
+					doc.set(update);
+					resolve(doc);
+
+					let mentions = doc.get('mentions');
+
+					if (Array.isArray(mentions)&&mentions.length>0){
+						Message.send(creator,mentions,{
+							type:config.messageType.AT,
+							topicId:doc.get('topicId')
+						})
+						.then(msg=>{
+							logger.info('send message to mentions success',msg);
+						})
+						.catch(err=>{
+							logger.error(err);
+						});
+					}
+				});
+		});
+		return;
+	}
+
+	static removeById(commentId,creator) {
+
+		return new Promise(function(resolve, reject) {
+			Comment.findOne({ _id:commentId,creator:creator })
 				.exec((err,doc)=>{
 					if (err){
 						return reject(err);
 					}else if (!doc){
-						return reject(new Error({
+						return reject({
 							code:404,
-							msg:'comment not found'
-						}));
+							msg:'comment not found or you are not the author of this comment'
+						});
 					}
-
+					let topicId = doc.get('topicId');
 					let p1 = doc.remove();
 					let p2 = User.update({
 						$inc:{
@@ -140,10 +189,19 @@ class CommentService {
 						}
 					})
 					.where('_id')
-					.equals(user)
+					.equals(creator)
 					.exec();
 
-					Promise.all([ p1,p2 ])
+					let p3 = Topic.update({
+						$inc:{
+							'meta.comments':-1
+						}
+					})
+					.where('_id')
+					.equals(topicId)
+					.exec();
+
+					Promise.all([ p1,p2,p3 ])
 						.then(args=>{
 							resolve(args);
 						})

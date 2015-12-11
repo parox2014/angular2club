@@ -1,63 +1,24 @@
 <%include ../common/header.ejs%>
-<body>
-
-<div>
-
-    <form id="loginForm">
-        <div>
-            <input type="email" name="account">
+<body layout="column">
+  <common-toolbar></common-toolbar>
+  <md-content layout="row"
+    layout-align="center center"
+    ng-controller="LoginController">
+        <div flex="30" class="md-whiteframe-1dp mdl-mg-2x mdl-pd-2x">
+            <login-form
+              form-title="登录"
+              on-success="onSuccess(user)"
+              on-error="onError(error)">
+            </login-form>
         </div>
-        <div>
-
-            <input type="password" name="password">
-        </div>
-        <div>
-            <button class="waves-effect waves-light btn" type="submit">登录</button>
-        </div>
-    </form>
-
-    <h3>
-        <a href="<%=qq%>">
-        QQ登录</a>
-    </h3>
-    <h3>
-        <a href="<%=github%>">github登录</a>
-    </h3>
-    <h3>
-        <a href="/signup">注册</a>
-    </h3>
-</div>
-
+  </md-content>
+<input type="hidden" value="<%=qq%>" name=qq>
+<input type="hidden" value="<%=github%>" name=github>
 <%include ../common/scripts.ejs%>
 <script>
-  (function () {
-    var loginForm=document.querySelector('#loginForm');
-
-    loginForm.addEventListener('submit',onSubmit);
-
-    function onSubmit(e){
-      e.preventDefault();
-
-      var data={
-        account:this.account.value,
-        password:this.password.value
-      }
-
-      sendAjax({
-          url:'/signin',
-          method:'POST',
-          data:data
-      },function(resp){
-        window.location.href='/';
-          console.log(resp);
-      },function (err) {
-        console.error(err);
-      });
-    }
-  })();
-
-
-
+angular.element(window).on('load', function () {
+  angular.bootstrap(document,['app.login']);
+});
 </script>
 </body>
 <%include ../common/footer.ejs%>

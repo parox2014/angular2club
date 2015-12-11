@@ -1,0 +1,26 @@
+{
+  "name": "angular2club",
+  "version": "0.0.1",
+  "author": "William Du",
+  "dependencies": {
+    "angular": "^1.4.6",
+    "angular-animate": "^1.4.6",
+    "angular-aria": "^1.4.6",
+    "angular-material": "^0.11.1",
+    "bootstrap": "^3.3.5",
+    "font-awesome": "^4.4.0",
+    "gulp": "^3.9.0",
+    "gulp-autoprefixer": "^2.3.1",
+    "gulp-concat": "^2.6.0",
+    "gulp-cssmin": "*",
+    "gulp-jshint": "*",
+    "gulp-minify-css": "^1.2.1",
+    "gulp-ng-annotate": "*",
+    "gulp-ng-html2js": "*",
+    "gulp-rename": "^1.2.2",
+    "gulp-sass": "*",
+    "gulp-uglify": "^1.4.0",
+    "gulp-util": "^3.0.6",
+    "gulp-watch": "^4.3.5"
+  }
+}

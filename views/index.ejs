@@ -1,42 +1,77 @@
 <%include ./common/header.ejs%>
+<body layout="column" layout-align="right bottom">
+  <common-toolbar show-menu-button="true"></common-toolbar>
+   <md-content layout="column" flex>
+       <left-menu></left-menu>
+       <h1 style="text-align: center;">angular2 club</h1>
+       <h3 style="text-align: center;">网站正在开发中，敬请期待......</h3>
+       <h5 style="text-align: center;font-family: 'Microsoft Yahei';">github项目地址：<a href="https://github.com/WilliamDu1981/angular2club">https://github.com/WilliamDu1981/angular2club</a> </h5>
+       <h5 style="text-align: center;font-family: 'Microsoft Yahei';">qq群:<a href="http://jq.qq.com/?_wv=1027&k=fkBdwB">461460156</a> ,欢迎志趣相投的朋友加入！</h5>
+   </md-content>
+   <md-fab-speed-dial md-direction="up" class="md-fab-bottom-right md-scale">
+       <md-fab-trigger>
+           <md-button aria-label="Add..." class="md-fab"><md-icon class="material-icons">add</md-icon></md-button>
+       </md-fab-trigger>
+       <md-fab-actions>
+           <md-button aria-label="{{'ADD_CREDIT_CARD'|translate}}" class="md-fab md-raised md-mini md-primary">
+               <md-icon class="material-icons">credit_card</md-icon>
+               <md-tooltip md-direction="left">
+                   {{'ADD_CREDIT_CARD'|translate}}
+               </md-tooltip>
+           </md-button>
+           <md-button aria-label="{{'ADD_DEPOSIT_CARD'|translate}}" class="md-fab md-raised md-mini md-primary">
+               <md-icon class="material-icons">card_giftcard</md-icon>
+               <md-tooltip md-direction="left">
+                   {{'ADD_DEPOSIT_CARD'|translate}}
+               </md-tooltip>
+           </md-button>
+           <md-button aria-label="{{'ADD_GAME_ACCOUNT'|translate}}" class="md-fab md-raised md-mini md-primary">
+               <md-icon class="material-icons">games</md-icon>
+               <md-tooltip md-direction="left">
+                   {{'ADD_GAME_ACCOUNT'|translate}}
+               </md-tooltip>
+           </md-button>
+           <md-button aria-label="{{'ADD_EMAIL_ACCOUNT'|translate}}" class="md-fab md-raised md-mini md-primary">
+               <md-icon class="material-icons">email</md-icon>
+               <md-tooltip md-direction="left">
+                   {{'ADD_EMAIL_ACCOUNT'|translate}}
+               </md-tooltip>
+           </md-button>
+           <md-button aria-label="{{'ADD_DEVICE_ACCOUNT'|translate}}" class="md-fab md-raised md-mini md-primary">
+               <md-icon class="material-icons">computer</md-icon>
+               <md-tooltip md-direction="left">
+                   {{'ADD_DEVICE_ACCOUNT'|translate}}
+               </md-tooltip>
+           </md-button>
 
-    <body>
-
-        <h1 style="text-align: center;">angular2 club</h1>
-        <h3 style="text-align: center;">网站正在开发中，敬请期待......</h3>
-        <h5 style="text-align: center;font-family: 'Microsoft Yahei';">github项目地址：<a href="https://github.com/WilliamDu1981/angular2club">https://github.com/WilliamDu1981/angular2club</a> </h5>
-        <h5 style="text-align: center;font-family: 'Microsoft Yahei';">qq群:<a href="http://jq.qq.com/?_wv=1027&k=fkBdwB">461460156</a> ,欢迎志趣相投的朋友加入！</h5>
-
-<%if(user){%>
-    <p>
-        <%=user.account%>
-    </p>
-    <p>
-        <%=user.profile.nickName%>
-    </p>
-    <img src="<%=user.profile.avatar%>" alt="avatar">
-    <a href="/signout">退出登录</a>
-<%}else{%>
-    <a href="/signin">请登录</a>
-<%}%>
-
+           <md-button aria-label="{{'ADD_MENO'|translate}}" class="md-fab md-raised md-mini md-primary">
+               <md-icon class="material-icons">note_add</md-icon>
+               <md-tooltip md-direction="left">
+                   {{'ADD_MENO'|translate}}
+               </md-tooltip>
+           </md-button>
+       </md-fab-actions>
+   </md-fab-speed-dial>
 
 <%include ./common/scripts.ejs%>
 <script>
-    (function(){
+    (function (global) {
+      <%if(user){%>
+        global.__currentUser={
+            _id:'<%=user._id%>',
+            account:'<%=user.account%>',
+            profile:{
+              nickName:'<%=user.profile.nickName%>',
+              avatar:'<%=user.profile.avatar%>'
+            }
+        };
+      <%}%>
+    })(window);
 
-        /*document.querySelector('#btn')
-                .addEventListener('click',function(){
-                    sendAjax({
-                        url:'/topic/564d69192080fc341884503b/vote?vote=1',
-                        method:'PUT'
-                    },function(resp){
-                        console.log(resp);
-                    },function(status,text){
-                        console.error(status,text);
-                    }) ;
-                });*/
-    })();
+
+    angular.element(window).on('load', function () {
+      angular.bootstrap(document,['app.starter']);
+    });
 </script>
 </body>
 <%include ./common/footer.ejs%>

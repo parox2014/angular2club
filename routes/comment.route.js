@@ -8,7 +8,14 @@ const auth = require('../middlewares');
 commentRouter.get('/',CommentCtrl.getCommentList);
 
 //添加评论
-//POST /commets
+//POST /comments
 commentRouter.post('/',auth.signinRequired,CommentCtrl.createComment);
 
+//删除评论
+//DELETE /comments/:id
+commentRouter.delete('/:id',auth.signinRequired,CommentCtrl.removeComment);
+
+//更新评论
+//PUT /comments/:id
+commentRouter.put('/:id',auth.signinRequired,CommentCtrl.updateComment);
 module.exports = commentRouter;

@@ -2,7 +2,7 @@
 
 const services = require('../services');
 const Comment = services.Comment;
-
+const Util = require('../util');
 class CommentController {
 
 	static createComment(req,res) {
@@ -44,10 +44,40 @@ class CommentController {
 	}
 
 	static removeComment(req,res) {
-
+		let commentId = req.params.id;
+		let creator = req.session.user;
+		Comment.removeById(commentId,creator)
+			.then(result=>{
+				res.status(204).send(result);
+			})
+			.catch(err=>{
+				res.responseError(err);
+			});
 	}
 	static updateComment(req,res) {
-		Comment.update();
+		req.checkBody('content','评论内容不能为空').notEmpty();
+		let mapErrors = req.validationErrors(true);
+
+		//如果存在错误，则向客户端返回错误
+		if (mapErrors) {
+			return res.responseError({
+				code:403,
+				msg: mapErrors
+			});
+		}
+
+		let creator = req.session.user;
+		let update = Util.pick(req.body,[ 'content','mentions' ]);
+		let id = req.params.id;
+
+
+		Comment.update(id,creator,update)
+			.then(doc=>{
+				res.status(201).json(doc);
+			})
+			.catch(err=>{
+				res.responseError(err);
+			});
 	}
 }
 module.exports = CommentController;

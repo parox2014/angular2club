@@ -1,0 +1,48 @@
+<form name="signinForm" class="padding" ng-submit="onSubmit()" layout="column" novalidate>
+
+    <h3 class="mdl-text-center" ng-bind="formTitle"></h3>
+    <md-input-container md-no-float class="md-block">
+        <md-icon md-icon="material-icons">email</md-icon>
+        <input ng-model="user.account"
+            name="account"
+            type="email"
+            placeholder="{{ 'EMAIL'|translate }}"
+            aria-label="email"
+            required>
+    </md-input-container>
+
+    <md-input-container md-no-float class="md-block">
+        <md-icon md-icon="material-icons">lock</md-icon>
+        <input ng-model="user.password"
+            name="password"
+            type="password"
+            ng-minlength="6"
+            ng-maxlength="20"
+            placeholder="请输入密码"
+            aria-label="password"
+            required>
+    </md-input-container>
+
+    <md-input-container md-no-float class="md-block">
+        <md-button type="submit"
+            flex="100"
+            class="md-primary md-raised"
+            ng-disabled="signinForm.$invalid||vm.isSubmiting">登录</md-button>
+    </md-input-container>
+
+    <md-input-container>
+        <md-menu-item>
+          <md-button href="/signup">还没有帐号？注册</md-button>
+        </md-menu-item>
+        <md-menu-item>
+          <md-button href="{{vm.qqUri}}">
+            QQ登录
+          </md-button>
+        </md-menu-item>
+
+        <md-menu-item>
+          <md-button href="{{vm.gitHubUri}}">github登录</md-button>
+        </md-menu-item>
+    </md-input-container>
+
+</form>

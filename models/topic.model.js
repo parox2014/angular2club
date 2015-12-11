@@ -44,19 +44,17 @@ const TopicSchema = new Schema({
   lastCommentAt: {
     type: Date
   },
+  //点赞的人
   voters: [ {
     type: ObjectId,
     ref: 'User'
   } ],
 
-  //点赞的人
+  //收藏的人
   favers: [ {
     type: ObjectId,
     ref: 'User'
   } ],
-
-  //收藏的人
-  comments: [],
   meta: {
     //点赞数
     votes: {
