@@ -28,10 +28,10 @@ module.exports = function(server) {
   server.get('/signout', SignCtrl.signout);
 
   //QQ授权登录
-  server.get('/oauth/qq', SignCtrl.qqOAuth);
+  server.get('/oauth/qq/callback', SignCtrl.qqOAuth);
 
   //github授权登录
-  server.get('/oauth/github', SignCtrl.githubOAuth);
+  server.get('/oauth/github/callback', SignCtrl.githubOAuth);
 
   server.use('/users', userRouter);
 

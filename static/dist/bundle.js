@@ -81,8 +81,8 @@ angular.module('app.starter',[
           },
           /**
            * 共用请求
-           * @param url 请求地址
-           * @param param 请求参数
+           * @param {String} url 请求地址
+           * @param {Object} param 请求参数
            * @returns {*|d.promise|promise}
            * @private
            */
@@ -127,7 +127,7 @@ angular.module('app.starter',[
            * @param  {String}                  cityId 城市Id
            * @return {Promise}                         [description]
            */
-          getRencentWeatherByCityId:function (cityId) {
+          getRecentWeatherByCityId:function (cityId) {
             return this._request(recentWeatherUri,{
               cityid:cityId
             });
@@ -154,7 +154,7 @@ angular.module('app.starter',[
             .getCityListByName('杭州')
             .then(function (resp) {
               cityId=resp[0].area_id;
-              return baiduWeather.getRencentWeatherByCityId(cityId);
+              return baiduWeather.getRecentWeatherByCityId(cityId);
             })
             .then(function(data){
               console.log('recent',data);

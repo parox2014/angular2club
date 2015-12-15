@@ -35,7 +35,7 @@ const config = {
         qq:{
             APP_ID:101268680,
             APP_KEY:'0bd1ac2e7948d03f0f75128239d71910',
-            CALLBACK_URI:'http://test.angular2.club/oauth/qq',
+            CALLBACK_URI:'http://test.angular2.club/oauth/qq/callback',
             HOST_NAME:'graph.qq.com',
             PATH_ACCESS_TOKEN:'/oauth2.0/token?',
             PATH_OPEN_ID:'/oauth2.0/me?',
@@ -47,7 +47,7 @@ const config = {
         github:{
             APP_ID:'48796150f263a025b74b',
             APP_KEY:'d6744a1216fa4d097842b7c97967a22646794742',
-            CALLBACK_URI:'http://test.angular2.club/oauth/github',
+            CALLBACK_URI:'http://test.angular2.club/oauth/github/callback',
             HOST_NAME:'github.com',
             PATH_ACCESS_TOKEN:'/login/oauth/access_token?',
             PATH_OPEN_ID:'/oauth2.0/me?',

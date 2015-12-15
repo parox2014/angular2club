@@ -22,8 +22,8 @@ class OAuth2 {
     this._requestOptions = {
       method: 'GET',
       headers: {
-        Accept: 'application/json',
-      },
+        Accept: 'application/json'
+      }
     };
 
     this._config = {};
@@ -119,6 +119,7 @@ class OAuth2 {
 
     return config.OAUTH_URI + querystring.stringify(authParams);
   }
+
 
   /**
    * 验证开放平台返回的状态值是否与本地的状态值一致

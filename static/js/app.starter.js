@@ -76,7 +76,7 @@ angular.module('app.starter',[
            * @param  {String}                  cityId 城市Id
            * @return {Promise}                         [description]
            */
-          getRencentWeatherByCityId:function (cityId) {
+          getRecentWeatherByCityId:function (cityId) {
             return this._request(recentWeatherUri,{
               cityid:cityId
             });
@@ -103,7 +103,7 @@ angular.module('app.starter',[
             .getCityListByName('杭州')
             .then(function (resp) {
               cityId=resp[0].area_id;
-              return baiduWeather.getRencentWeatherByCityId(cityId);
+              return baiduWeather.getRecentWeatherByCityId(cityId);
             })
             .then(function(data){
               console.log('recent',data);
