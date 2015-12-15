@@ -97,4 +97,5 @@ server.listen(config.PORT, function() {
   logger.info('server start success at port:' + config.PORT);
 });
 
+logger.info(require('http').STATUS_CODES);
 module.exports = server;

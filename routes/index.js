@@ -38,4 +38,5 @@ module.exports = function(server) {
   server.use('/topics', topicRouter);
 
   server.use('/comments',commentRouter);
+
 };

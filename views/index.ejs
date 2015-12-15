@@ -1,5 +1,5 @@
 <%include ./common/header.ejs%>
-<body layout="column" layout-align="right bottom">
+<body layout="column" layout-align="right bottom" ng-controller="TestController">
   <common-toolbar show-menu-button="true"></common-toolbar>
    <md-content layout="column" flex>
        <left-menu></left-menu>
@@ -13,7 +13,10 @@
            <md-button aria-label="Add..." class="md-fab"><md-icon class="material-icons">add</md-icon></md-button>
        </md-fab-trigger>
        <md-fab-actions>
-           <md-button aria-label="{{'ADD_CREDIT_CARD'|translate}}" class="md-fab md-raised md-mini md-primary">
+           <md-button
+            ng-click="getData()"
+            aria-label="{{'ADD_CREDIT_CARD'|translate}}"
+            class="md-fab md-raised md-mini md-primary">
                <md-icon class="material-icons">credit_card</md-icon>
                <md-tooltip md-direction="left">
                    {{'ADD_CREDIT_CARD'|translate}}
@@ -54,6 +57,7 @@
    </md-fab-speed-dial>
 
 <%include ./common/scripts.ejs%>
+
 <script>
     (function (global) {
       <%if(user){%>
@@ -72,6 +76,17 @@
     angular.element(window).on('load', function () {
       angular.bootstrap(document,['app.starter']);
     });
+
+    /*var s=document.createElement('script');
+
+    s.type='text/javascript';
+    s.sync=true;
+    s.src='/jsonp?callback=cb';
+    document.body.appendChild(s);
+
+    function cb(data) {
+      console.log(data)
+    }*/
 </script>
 </body>
 <%include ./common/footer.ejs%>
