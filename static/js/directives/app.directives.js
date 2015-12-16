@@ -18,7 +18,7 @@
                         return;
                     }
 
-                    user.unique(field,value)
+                    user.unique(value)
                         .success(function (resp) {
                             console.log(resp);
                             ngModel.$setValidity('unique',true);

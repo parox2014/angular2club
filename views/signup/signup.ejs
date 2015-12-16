@@ -1,49 +1,24 @@
 <%include ../common/header.ejs%>
-<body>
-
-<div>
-    <form id="signupForm">
-        <div>
-            <input name="account" type="email">
+<body layout="column">
+  <common-toolbar></common-toolbar>
+  <md-content layout="row"
+    layout-align="center center"
+    ng-controller="RegisterStep1Controller">
+        <div flex="30" class="md-whiteframe-1dp mdl-mg-2x mdl-pd-2x">
+            <register-form
+              form-title="用户注册"
+              on-success="onSuccess(user)"
+              on-error="onError(error)">
+            </register-form>
         </div>
-        <div>
-            <input name="nickName" type="text">
-        </div>
-        <div>
-            <input name="password" type="password">
-        </div>
-        <div>
-            <button type="submit">注册</button>
-        </div>
-    </form>
-
-</div>
-
+  </md-content>
+<input type="hidden" value="<%=qq%>" name=qq>
+<input type="hidden" value="<%=github%>" name=github>
 <%include ../common/scripts.ejs%>
 <script>
-    document.querySelector('#signupForm')
-            .addEventListener('submit',function(e){
-                e.preventDefault();
-
-                var parmas={
-                    account:document.querySelector('[name="account"]').value,
-                    nickName:document.querySelector('[name="nickName"]').value,
-                    password:document.querySelector('[name="password"]').value
-                };
-
-
-                sendAjax({
-                    url:'/signup',
-                    method:'POST',
-                    data:parmas
-                },function(resp){
-                  alert('注册成功,请前往邮箱激活帐号');
-                  console.log(resp);
-                },function (err) {
-                  console.error(err);
-                });
-            });
+angular.element(window).on('load', function () {
+  angular.bootstrap(document,['app.register']);
+});
 </script>
-
 </body>
 <%include ../common/footer.ejs%>

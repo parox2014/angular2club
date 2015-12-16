@@ -14,10 +14,9 @@
             signin:function () {
                 return $http.post(api.user.SIGN_IN,this.toJson());
             },
-            unique:function (field,value) {
+            unique:function (value) {
                 var params={
-                    field:field,
-                    value:value
+                    account:value
                 };
                 return $http.get(api.user.CHECK,{params:params});
             },
@@ -31,4 +30,3 @@
         };
     }
 })();
-

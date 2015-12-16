@@ -31,7 +31,9 @@ class SignController {
    */
   static showSignup(req, res) {
     res.render('signup/signup', {
-      title: '注册'
+      title: '注册',
+      github: githubAuthClient.generateOAuthUri(githubAuthConfig.SCOPE),
+      qq: qqAuthClient.generateOAuthUri()
     });
   }
 

@@ -12,6 +12,8 @@
                     scope.toggleSideMenu = function () {
                         $mdSidenav('leftMenu').toggle();
                     };
+
+                    scope.currentUser=window.__currentUser;
                 }
             };
         });

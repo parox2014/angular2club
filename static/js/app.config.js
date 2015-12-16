@@ -9,16 +9,18 @@
                 SIGN_UP:'/signup',
                 SIGN_IN:'/signin',
                 SIGN_OUT:'/signout',
-                CHECK:'/user/check'
+                UNIQUE:'/user/unique'
             }
         };
     }
 
-    function appConfig($translateProvider,$mdThemingProvider) {
+    function appConfig($translateProvider,$mdThemingProvider,$httpProvider) {
 
         $mdThemingProvider
             .theme('default')
             .primaryPalette('indigo')
             .accentPalette('red');
+
+        $httpProvider.defaults.headers.common['X-Requested-With']='XMLHttpRequest';
     }
 })();

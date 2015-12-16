@@ -9,17 +9,19 @@
                 SIGN_UP:'/signup',
                 SIGN_IN:'/signin',
                 SIGN_OUT:'/signout',
-                CHECK:'/user/check'
+                UNIQUE:'/user/unique'
             }
         };
     }
 
-    function appConfig($translateProvider,$mdThemingProvider) {
+    function appConfig($translateProvider,$mdThemingProvider,$httpProvider) {
 
         $mdThemingProvider
             .theme('default')
             .primaryPalette('indigo')
             .accentPalette('red');
+
+        $httpProvider.defaults.headers.common['X-Requested-With']='XMLHttpRequest';
     }
 })();
 
@@ -184,6 +186,8 @@ angular.module('app.starter',[
                     scope.toggleSideMenu = function () {
                         $mdSidenav('leftMenu').toggle();
                     };
+
+                    scope.currentUser=window.__currentUser;
                 }
             };
         });
@@ -236,24 +240,6 @@ angular.module('app.component')
         }
     };
 });
-
-angular.module('app.component')
-    .directive('mdlTextfield',function () {
-        return {
-            restrict:'EAC',
-            link:function (scope,element)  {
-                new MaterialTextfield(element[0]);
-            }
-        }
-    })
-    .directive('mdlButton',function () {
-        return {
-            restrict:'EAC',
-            link:function (scope,element) {
-                new MaterialButton(element[0]);
-            }
-        }
-    });
 
 (function () {
     angular.module('app.component')
@@ -314,7 +300,7 @@ angular.module('app.component')
                         return;
                     }
 
-                    user.unique(field,value)
+                    user.unique(value)
                         .success(function (resp) {
                             console.log(resp);
                             ngModel.$setValidity('unique',true);
@@ -463,10 +449,9 @@ angular.module('app.component')
             signin:function () {
                 return $http.post(api.user.SIGN_IN,this.toJson());
             },
-            unique:function (field,value) {
+            unique:function (value) {
                 var params={
-                    field:field,
-                    value:value
+                    account:value
                 };
                 return $http.get(api.user.CHECK,{params:params});
             },
@@ -480,7 +465,6 @@ angular.module('app.component')
         };
     }
 })();
-
 
 angular
     .module('app.login',[
