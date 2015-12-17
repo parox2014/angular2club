@@ -13,12 +13,12 @@ class UserController {
    * @param res
    */
   static unique(req, res) {
-    User.unique(req.query)
+    User.unique(req.query.account)
       .then(function(isExist) {
         if (isExist) {
           res.responseError({
-            code:403,
-            msg:'account is exist'
+            code: 403,
+            msg: 'account is exist'
           });
         } else {
           res.json({
@@ -29,8 +29,8 @@ class UserController {
       }, function(err) {
 
         res.responseError({
-          code:403,
-          msg:err
+          code: 403,
+          msg: err
         });
       });
   }
@@ -62,11 +62,11 @@ class UserController {
 
     var update = Object.assign({}, reqBody);
 
-    User.updateProfile(req.session.user,update)
-      .then(doc=>{
+    User.updateProfile(req.session.user, update)
+      .then(doc => {
         res.json(doc);
       })
-      .catch(err=>{
+      .catch(err => {
         res.responseError(err);
       });
   }
@@ -80,10 +80,10 @@ class UserController {
     var uid = req.params.id;
 
     User.getById(uid)
-      .then(doc=>{
+      .then(doc => {
         res.json(doc);
       })
-      .catch(err=>{
+      .catch(err => {
         res.responseError(err);
       });
   }

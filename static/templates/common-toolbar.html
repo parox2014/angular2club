@@ -11,9 +11,39 @@
             <span>Angular 2 中文社区</span>
         </h2>
         <span flex></span>
+        <a href="/signin" ng-if="!currentUser">登录</a>
+        <md-menu ng-if="currentUser">
+          <md-button aria-label="Open menu" class="md-icon-button" ng-click="$mdOpenMenu($event)">
+            <md-avatar profile="currentUser.profile"></md-avatar>
+          </md-button>
+          <md-menu-content width="6">
+            <div class="mdl-pd-2x" layout="row">
+              <md-avatar profile="currentUser.profile"></md-avatar>
+              <div layout="column" class="mdl-mg-hor-1x">
+                <div>
+                  {{currentUser.profile.nickName}}
+                </div>
+                <div>
+                  {{currentUser.account}}
+                </div>
+              </div>
+            </div>
 
-        <md-button class="md-fab md-mini" aria-label="Favorite">
-          <img ng-src="{{currentUser.profile.avatar}}">
-        </md-button>
+            <md-menu-item>
+              <md-button ui-sref="user.profile">
+                <md-icon class="material-icons">account_circle</md-icon>
+                个人资料
+              </md-button>
+            </md-menu-item>
+
+            <md-menu-item>
+              <md-button href="/signout" class="md-warn">
+                <md-icon class="material-icons">power_settings_new</md-icon>
+                退出登录
+              </md-button>
+            </md-menu-item>
+          </md-menu-content>
+        </md-menu>
     </div>
+    <md-progress-linear md-mode="indeterminate" class="md-primary md-hue-1" ng-show="vm.isShowLoading"></md-progress-linear>
 </md-toolbar>

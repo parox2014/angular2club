@@ -2,14 +2,8 @@
 <body layout="column">
   <common-toolbar></common-toolbar>
   <md-content layout="row"
-    layout-align="center center"
-    ng-controller="RegisterStep1Controller">
-        <div flex="30" class="md-whiteframe-1dp mdl-mg-2x mdl-pd-2x">
-            <register-form
-              form-title="用户注册"
-              on-success="onSuccess(user)"
-              on-error="onError(error)">
-            </register-form>
+    layout-align="center center">
+        <div flex="30" class="md-whiteframe-1dp mdl-mg-2x mdl-pd-2x" style="min-width:500px;" ui-view>
         </div>
   </md-content>
 <input type="hidden" value="<%=qq%>" name=qq>

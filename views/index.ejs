@@ -1,29 +1,35 @@
 <%include ./common/header.ejs%>
-<body layout="column" layout-align="right bottom" ng-controller="TestController">
+<body layout="column" layout-align="right bottom" ng-controller="MainController">
   <common-toolbar show-menu-button="true"></common-toolbar>
-   <md-content layout="column" flex>
+   <md-content layout="row" layout-align="center" flex>
        <left-menu></left-menu>
-       <p style="text-align: center;">网站正在开发中，敬请期待......</p>
-       <p style="text-align: center;font-family: 'Microsoft Yahei';">github项目地址：<a href="https://github.com/WilliamDu1981/angular2club">https://github.com/WilliamDu1981/angular2club</a> </p>
-       <p style="text-align: center;font-family: 'Microsoft Yahei';">qq群:<a href="http://jq.qq.com/?_wv=1027&k=fkBdwB">461460156</a> ,欢迎志趣相投的朋友加入！</p>
+       <div flex="70" class="md-whiteframe-2dp mdl-mg-2x">
+          <md-list>
+            <md-list-item>
+              <img ng-src="" class="md-avatar" alt="topic" />
+              <div class="md-list-item-text">
+                 this is an topic
+              </div>
+            </md-list-item>
+            <md-list-item>
+              <img ng-src="" class="md-avatar" alt="topic" />
+              <div class="md-list-item-text">
+                 this is an topic
+              </div>
+            </md-list-item>
+            <md-list-item>
+              <img ng-src="" class="md-avatar" alt="topic" />
+              <div class="md-list-item-text">
+                 this is an topic
+              </div>
+            </md-list-item>
+          </md-list>
+         <p style="text-align: center;">网站正在开发中，敬请期待......</p>
+         <p style="text-align: center;font-family: 'Microsoft Yahei';">github项目地址：<a href="https://github.com/WilliamDu1981/angular2club">https://github.com/WilliamDu1981/angular2club</a> </p>
+         <p style="text-align: center;font-family: 'Microsoft Yahei';">qq群:<a href="http://jq.qq.com/?_wv=1027&k=fkBdwB">461460156</a> ,欢迎志趣相投的朋友加入！</p>
+       </div>
    </md-content>
-   <md-fab-speed-dial md-direction="up" class="md-fab-bottom-right md-scale">
-       <md-fab-trigger>
-           <md-button aria-label="Add..." class="md-fab"><md-icon class="material-icons">add</md-icon></md-button>
-       </md-fab-trigger>
-       <md-fab-actions>
-           <md-button
-            ng-click="getData()"
-            aria-label="{{'ADD_CREDIT_CARD'|translate}}"
-            class="md-fab md-raised md-mini md-primary">
-               <md-icon class="material-icons">credit_card</md-icon>
-               <md-tooltip md-direction="left">
-                   {{'ADD_CREDIT_CARD'|translate}}
-               </md-tooltip>
-           </md-button>
-
-       </md-fab-actions>
-   </md-fab-speed-dial>
+   <main-menu></main-menu>
 
 <%include ./common/scripts.ejs%>
 

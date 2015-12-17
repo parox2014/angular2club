@@ -1,69 +1,86 @@
-(function () {
-    var directives=angular.module('app.directives',[]);
+(function() {
+  var directives = angular.module('app.directives', []);
 
-    directives.directive('unique',uniqueDirecitve);
+  directives.directive('unique', uniqueDirecitve);
 
-    function uniqueDirecitve($parse,user) {
-        return {
-            require:'?^ngModel',
-            link:function (scope,element,attr,ngModel) {
-                var field=attr.unique;
-                var isUnique=false;
-                var getNgModel=$parse(attr.ngModel);
+  function uniqueDirecitve($parse, user) {
+    return {
+      require: '?^ngModel',
+      link: function(scope, element, attr, ngModel) {
+        var isUnique = false;
+        var getNgModel = $parse(attr.ngModel);
 
-                element.bind('blur',function () {
-                    var value=getNgModel(scope);
+        element.bind('blur', function() {
+          var value = getNgModel(scope);
 
-                    if(isUnique||!value){
-                        return;
-                    }
+          if (isUnique || !value) {
+            return;
+          }
 
-                    user.unique(value)
-                        .success(function (resp) {
-                            console.log(resp);
-                            ngModel.$setValidity('unique',true);
-                            isUnique=true;
-                        })
-                        .error(function (err) {
-                            console.log(err);
-                            ngModel.$setValidity('unique',false);
-                            isUnique=true;
-                        });
-                });
+          user.unique(value)
+            .success(function(resp) {
+              console.log(resp);
+              ngModel.$setValidity('unique', true);
+              isUnique = true;
+            })
+            .error(function(err) {
+              console.log(err);
+              ngModel.$setValidity('unique', false);
+              isUnique = true;
+            });
+        });
 
-                element.bind('input',function () {
-                    isUnique=false;
-                });
-            }
+        element.bind('input', function() {
+          isUnique = false;
+        });
+      }
+    };
+  }
+
+  directives.directive('languageMenu', languageMenuDirective);
+
+  function languageMenuDirective($translate) {
+    return {
+      link: function(scope, element) {
+        var langs = [{
+          text: '中文',
+          value: 'zh_CN',
+          isChecked: true
+        }, {
+          text: 'English',
+          value: 'en',
+          isChecked: false
+        }, ];
+
+        scope.openMenu = function($mdOpenMenu, ev) {
+          $mdOpenMenu(ev);
         };
-    }
 
-    directives.directive('languageMenu',languageMenuDirective);
+        scope.changeLang = function(lang) {
+          $translate.use(lang.value);
+          angular.forEach(langs, function(item) {
+            item.isChecked = false;
+          });
 
-    function languageMenuDirective ($translate) {
-        return {
-            link:function (scope,element) {
-                var langs=[
-                    {text:'中文',value:'zh_CN',isChecked:true},
-                    {text:'English',value:'en',isChecked:false},
-                ];
+          lang.isChecked = true;
+        };
 
-                scope.openMenu=function($mdOpenMenu, ev) {
-                  $mdOpenMenu(ev);
-                };
+        scope.langs = langs;
+      }
+    };
+  }
 
-                scope.changeLang=function (lang) {
-                    $translate.use(lang.value);
-                    angular.forEach(langs, function(item) {
-                        item.isChecked=false;
-                    });
+  directives.directive('mdAvatar', avatarDirective);
 
-                    lang.isChecked=true;
-                };
-
-                scope.langs=langs;
-            }
-        }
-    }
+  function avatarDirective() {
+    return {
+      restrict: 'EA',
+      replace: true,
+      templateUrl: '../templates/avatar.html',
+      scope: {
+        profile: '='
+      }
+    };
+  }
 
 })();

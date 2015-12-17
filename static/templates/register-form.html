@@ -1,6 +1,6 @@
-<form name="registerForm"
-            ng-submit="onSubmit()"
-            >
+<form
+  name="registerForm"
+  ng-submit="onSubmit()">
     <md-input-container>
         <h3 class="mdl-text-center" ng-bind="formTitle"></h3>
     </md-input-container>
@@ -10,9 +10,14 @@
             name="account"
             type="email"
             unique="account"
-            placeholder="{{ 'EMAIL'|translate }}"
-               aria-label="email"
+            placeholder="邮箱"
+            aria-label="email"
             required>
+        <div ng-messages="registerForm.account.$error">
+          <div ng-message="required">邮箱必填</div>
+          <div ng-message="email">邮箱格式不正确</div>
+          <div ng-message="unique">此邮箱已经注册</div>
+        </div>
     </md-input-container>
 
     <md-input-container md-no-float class="md-block">
@@ -20,11 +25,16 @@
         <input ng-model="user.nickName"
             name="nickName"
             type="text"
-            placeholder="{{ 'NICK_NAME'|translate }}"
+            placeholder="昵称"
             ng-minlength="2"
             ng-maxlength="20"
-               aria-label="nickname"
+            aria-label="nickname"
             required>
+          <div ng-messages="registerForm.nickName.$error">
+            <div ng-message="required">昵称必填</div>
+            <div ng-message="minlength">昵称不能少于两个字</div>
+            <div ng-message="maxlength">昵称不能多于20个字</div>
+          </div>
         </div>
     </md-input-container>
 
@@ -35,20 +45,36 @@
             type="password"
             ng-minlength="6"
             ng-maxlength="20"
-            placeholder="{{ 'PASSWORD'|translate }}"
-               aria-label="password"
+            placeholder="密码"
+            aria-label="password"
             required>
+            <div ng-messages="registerForm.password.$error">
+              <div ng-message="required">密码必填</div>
+              <div ng-message="minlength">密码不能少于6个字符</div>
+              <div ng-message="maxlength">密码不能多于20个字符</div>
+            </div>
     </md-input-container>
 
     <md-input-container md-no-float class="md-block">
         <md-button type="submit" flex="100"
             class="md-primary md-raised"
-            ng-disabled="registerForm.$invalid||vm.isSubmiting"
-            ng-bind="'REGISTER_BUTTON_TEXT'|translate">
+            ng-disabled="registerForm.$invalid||vm.isSubmiting">
+            注册
         </md-button>
     </md-input-container>
 
     <md-input-container>
-        <md-button href="/signin">{{ 'ALREADY_HAVE_AN_ACCOUNT'|translate }}?{{ 'LOGIN_BUTTON_TEXT'|translate }}</md-button>
+      <md-menu-item>
+        <md-button href="/signin">已有帐号？登录</md-button>
+      </md-menu-item>
+      <md-menu-item>
+        <md-button href="{{vm.qqUri}}">
+          QQ登录
+        </md-button>
+      </md-menu-item>
+
+      <md-menu-item>
+        <md-button href="{{vm.gitHubUri}}">github登录</md-button>
+      </md-menu-item>
     </md-input-container>
 </form>

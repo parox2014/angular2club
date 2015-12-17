@@ -1,28 +1,64 @@
-(function () {
-    angular.module('app.config',[])
-    .factory('api',api)
+(function() {
+  angular.module('app.config', [])
+    .factory('api', api)
+    .constant('baiduWeatherApiKey', '6aa7516564286a7fed27f1b7745a3b6c')
+    .factory('httpInterceptor', interceptor)
     .config(appConfig);
 
-    function api() {
-        return{
-            user:{
-                SIGN_UP:'/signup',
-                SIGN_IN:'/signin',
-                SIGN_OUT:'/signout',
-                UNIQUE:'/user/unique'
-            }
-        };
-    }
+  function api() {
+    return {
+      user: {
+        SIGN_UP: '/signup',
+        SIGN_IN: '/signin',
+        SIGN_OUT: '/signout',
+        UNIQUE: '/users/unique'
+      }
+    };
+  }
 
-    function appConfig($translateProvider,$mdThemingProvider,$httpProvider) {
+  function appConfig($translateProvider, $mdThemingProvider, $httpProvider) {
 
-        $mdThemingProvider
-            .theme('default')
-            .primaryPalette('indigo')
-            .accentPalette('red');
+    $mdThemingProvider
+      .theme('default')
+      .primaryPalette('indigo')
+      .accentPalette('red');
 
-        $httpProvider.defaults.headers.common['X-Requested-With']='XMLHttpRequest';
-    }
+    $httpProvider.defaults.headers.common['X-Requested-With'] =
+      'XMLHttpRequest';
+
+    $httpProvider.interceptors.push('httpInterceptor');
+  }
+
+  //拦截器
+  function interceptor($q, $rootScope) {
+    return {
+      // optional method
+      'request': function(config) {
+        $rootScope.$broadcast('$requestStart', config);
+        return config;
+      },
+
+      // optional method
+      'requestError': function(rejection) {
+        $rootScope.$broadcast('$requestError', rejection);
+        return $q.reject(rejection);
+      },
+
+
+
+      // optional method
+      'response': function(response) {
+        $rootScope.$broadcast('$requestSuccess', response);
+        return response;
+      },
+
+      // optional method
+      'responseError': function(rejection) {
+        $rootScope.$broadcast('$responseError', rejection);
+        return $q.reject(rejection);
+      }
+    };
+  }
 })();
 
 (function () {
@@ -56,98 +92,10 @@ angular.module('app.starter',[
         'app.core',
         'app.config',
         'app.routes',
-        'app.user'
+        'app.user',
+        'app.baiduWeather'
       ])
-      .constant('baiduWeatherApiKey','6aa7516564286a7fed27f1b7745a3b6c')
-
-      //百度天气服务
-      .factory('BaiduWeather',function ($http,$q) {
-        var cityListUri = 'http://apis.baidu.com/apistore/weatherservice/citylist';
-        var recentWeatherUri = 'http://apis.baidu.com/apistore/weatherservice/recentweathers';
-        var todayWeatherUri = 'http://apis.baidu.com/apistore/weatherservice/cityid';
-
-        function BaiduWeather(apiKey) {
-          this.API_KEY = apiKey;
-        }
-
-        BaiduWeather.prototype = {
-          /**
-           * 判断请求是否成功
-           * @method _isReqSuccess
-           * @param  {String}      msg [description]
-           * @return {Boolean}         [description]
-           * @private
-           */
-          _isReqSuccess:function (msg) {
-            return msg === 'success';
-          },
-          /**
-           * 共用请求
-           * @param {String} url 请求地址
-           * @param {Object} param 请求参数
-           * @returns {*|d.promise|promise}
-           * @private
-           */
-          _request:function(url,param){
-            var deferred = $q.defer();
-            var that = this;
-
-            $http({
-              url:url,
-              method:'GET',
-              params:param,
-              headers:{
-                apiKey:this.API_KEY
-              }
-            })
-            .success(function (resp) {
-              if (that._isReqSuccess(resp.errMsg)){
-                return deferred.resolve(resp.retData);
-              }
-              deferred.reject(resp);
-            })
-            .error(function (err) {
-              deferred.reject(err);
-            });
-
-            return deferred.promise;
-          },
-          /**
-           * 获取城市列表
-           * @method getCityListByName
-           * @param  {String}          cityName 城市名称
-           * @return {[type]}                   [description]
-           */
-          getCityListByName:function (cityName) {
-            return this._request(cityListUri, {
-                  cityname:cityName
-                });
-          },
-          /**
-           * 获取最近天气，过去七天与未来四天
-           * @method getRencentWeatherByCityId
-           * @param  {String}                  cityId 城市Id
-           * @return {Promise}                         [description]
-           */
-          getRecentWeatherByCityId:function (cityId) {
-            return this._request(recentWeatherUri,{
-              cityid:cityId
-            });
-          },
-          /**
-           * 获取今天的天气
-           * @param cityId
-           * @returns {*|d.promise|promise}
-             */
-          getTodayWeatherByCityId:function(cityId){
-            return this._request(todayWeatherUri,{
-              cityid:cityId
-            });
-          }
-        };
-        return BaiduWeather;
-      })
-      .controller('TestController',function ($scope,BaiduWeather,baiduWeatherApiKey) {
+      .controller('MainController',function ($scope,BaiduWeather,baiduWeatherApiKey) {
         var baiduWeather = new BaiduWeather(baiduWeatherApiKey);
         var cityId;
 
@@ -170,27 +118,55 @@ angular.module('app.starter',[
             });
 
         };
+      })
+      .run(function (user) {
+        user.currentUser(window.__currentUser)
       });
 
-(function () {
-    angular
-        .module('app.component',[ 'app.user','ngMessages' ])
-        .directive('commonToolbar',function ($mdSidenav) {
-            return {
-                templateUrl:'../templates/common-toolbar.html',
-                scope:{
-                    showMenuButton:'@'
-                },
-                replace:true,
-                link:function (scope,element) {
-                    scope.toggleSideMenu = function () {
-                        $mdSidenav('leftMenu').toggle();
-                    };
+(function() {
+  angular
+    .module('app.component', ['app.user', 'ngMessages'])
+    .directive('commonToolbar', function($mdSidenav, user, $timeout) {
+      return {
+        templateUrl: '../templates/common-toolbar.html',
+        scope: {
+          showMenuButton: '@'
+        },
+        replace: true,
+        link: function(scope, element) {
+          scope.toggleSideMenu = function() {
+            $mdSidenav('leftMenu').toggle();
+          };
 
-                    scope.currentUser=window.__currentUser;
-                }
-            };
-        });
+          scope.currentUser = user.currentUser();
+
+          scope.vm = {
+            isShowLoading: false
+          };
+
+          scope.$on('$requestStart', function(argument) {
+            toggleLoading(true);
+          });
+
+          scope.$on('$requestSuccess', function() {
+            toggleLoading(false);
+          });
+
+          scope.$on('$responseError', function() {
+            toggleLoading(false);
+          });
+
+          function toggleLoading(isShow) {
+            if (isShow) {
+              return (scope.vm.isShowLoading = isShow);
+            }
+            $timeout(function() {
+              scope.vm.isShowLoading = isShow;
+            }, 500);
+          }
+        }
+      };
+    });
 })();
 
 (function (angular) {
@@ -241,112 +217,149 @@ angular.module('app.component')
     };
 });
 
-(function () {
-    angular.module('app.component')
-        .directive('registerForm',registerFormDirective);
+(function() {
+  angular.module('app.component')
+    .directive('mainMenu', mainMenuDirective);
 
-        function registerFormDirective(user) {
-            return {
-                restrict:'EA',
-                replace:true,
-                templateUrl:'../templates/register-form.html',
-                scope:{
-                    formTitle:'@',
-                    onSuccess:'&',
-                    onError:'&'
-                },
-                link:function (scope,element) {
+  function mainMenuDirective(user) {
+    return {
+      restrict: 'EA',
+      replace: true,
+      templateUrl: '../templates/main-menu.html',
+      link: function(scope, element) {
 
-                    var viewModel=scope.vm={
-                        isSubmiting:false
-                    };
-
-                    scope.user=user;
-
-                    scope.onSubmit=function () {
-                        viewModel.isSubmiting=true;
-                        user.signup()
-                        .success(function (resp) {
-                            scope.onSuccess({user:resp});
-                        })
-                        .error(function (resp) {
-                            viewModel.isSubmiting=false;
-                            scope.onError({error:resp});
-                        });
-                    };
-
-                }
-            };
-        }
+      }
+    };
+  }
 })();
 
-(function () {
-    var directives=angular.module('app.directives',[]);
+(function() {
+  angular.module('app.component')
+    .directive('registerForm', registerFormDirective);
 
-    directives.directive('unique',uniqueDirecitve);
+  function registerFormDirective(user) {
+    return {
+      restrict: 'EA',
+      replace: true,
+      templateUrl: '../templates/register-form.html',
+      scope: {
+        formTitle: '@',
+        onSuccess: '&',
+        onError: '&'
+      },
+      link: function(scope, element) {
 
-    function uniqueDirecitve($parse,user) {
-        return {
-            require:'?^ngModel',
-            link:function (scope,element,attr,ngModel) {
-                var field=attr.unique;
-                var isUnique=false;
-                var getNgModel=$parse(attr.ngModel);
-
-                element.bind('blur',function () {
-                    var value=getNgModel(scope);
-
-                    if(isUnique||!value){
-                        return;
-                    }
-
-                    user.unique(value)
-                        .success(function (resp) {
-                            console.log(resp);
-                            ngModel.$setValidity('unique',true);
-                            isUnique=true;
-                        })
-                        .error(function (err) {
-                            console.log(err);
-                            ngModel.$setValidity('unique',false);
-                            isUnique=true;
-                        });
-                });
-
-                element.bind('input',function () {
-                    isUnique=false;
-                });
-            }
+        var viewModel = scope.vm = {
+          isSubmiting: false
         };
-    }
 
-    directives.directive('languageMenu',languageMenuDirective);
+        scope.user = user;
 
-    function languageMenuDirective ($translate) {
-        return {
-            link:function (scope,element) {
-                var langs=[
-                    {text:'中文',value:'zh_CN',isChecked:true},
-                    {text:'English',value:'en',isChecked:false},
-                ];
+        scope.onSubmit = function() {
+          viewModel.isSubmiting = true;
+          user.signup()
+            .success(function(resp) {
+              scope.onSuccess({
+                user: resp
+              });
+            })
+            .error(function(resp) {
+              viewModel.isSubmiting = false;
+              scope.onError({
+                error: resp
+              });
+            });
+        };
 
-                scope.openMenu=function($mdOpenMenu, ev) {
-                  $mdOpenMenu(ev);
-                };
+      }
+    };
+  }
+})();
 
-                scope.changeLang=function (lang) {
-                    $translate.use(lang.value);
-                    angular.forEach(langs, function(item) {
-                        item.isChecked=false;
-                    });
+(function() {
+  var directives = angular.module('app.directives', []);
 
-                    lang.isChecked=true;
-                };
+  directives.directive('unique', uniqueDirecitve);
 
-                scope.langs=langs;
-            }
-        }
-    }
+  function uniqueDirecitve($parse, user) {
+    return {
+      require: '?^ngModel',
+      link: function(scope, element, attr, ngModel) {
+        var isUnique = false;
+        var getNgModel = $parse(attr.ngModel);
+
+        element.bind('blur', function() {
+          var value = getNgModel(scope);
+
+          if (isUnique || !value) {
+            return;
+          }
+
+          user.unique(value)
+            .success(function(resp) {
+              console.log(resp);
+              ngModel.$setValidity('unique', true);
+              isUnique = true;
+            })
+            .error(function(err) {
+              console.log(err);
+              ngModel.$setValidity('unique', false);
+              isUnique = true;
+            });
+        });
+
+        element.bind('input', function() {
+          isUnique = false;
+        });
+      }
+    };
+  }
+
+  directives.directive('languageMenu', languageMenuDirective);
+
+  function languageMenuDirective($translate) {
+    return {
+      link: function(scope, element) {
+        var langs = [{
+          text: '中文',
+          value: 'zh_CN',
+          isChecked: true
+        }, {
+          text: 'English',
+          value: 'en',
+          isChecked: false
+        }, ];
+
+        scope.openMenu = function($mdOpenMenu, ev) {
+          $mdOpenMenu(ev);
+        };
+
+        scope.changeLang = function(lang) {
+          $translate.use(lang.value);
+          angular.forEach(langs, function(item) {
+            item.isChecked = false;
+          });
+
+          lang.isChecked = true;
+        };
+
+        scope.langs = langs;
+      }
+    };
+  }
+
+  directives.directive('mdAvatar', avatarDirective);
+
+  function avatarDirective() {
+    return {
+      restrict: 'EA',
+      replace: true,
+      templateUrl: '../templates/avatar.html',
+      scope: {
+        profile: '='
+      }
+    };
+  }
 
 })();
 
@@ -433,37 +446,139 @@ angular.module('app.component')
         });
 })(angular);
 
-(function(){
+(function () {
+  angular
+      .module('app.baiduWeather',[])
+      //百度天气服务
+      .factory('BaiduWeather',function ($http,$q) {
+        var cityListUri = 'http://apis.baidu.com/apistore/weatherservice/citylist';
+        var recentWeatherUri = 'http://apis.baidu.com/apistore/weatherservice/recentweathers';
+        var todayWeatherUri = 'http://apis.baidu.com/apistore/weatherservice/cityid';
 
-    angular
-        .module('app.user',[
-            'app.config'
-        ])
-        .factory('user',userService);
+        function BaiduWeather(apiKey) {
+          this.API_KEY = apiKey;
+        }
 
-    function userService($http,api){
-        return {
-            signup:function () {
-                return $http.post(api.user.SIGN_UP,this.toJson());
-            },
-            signin:function () {
-                return $http.post(api.user.SIGN_IN,this.toJson());
-            },
-            unique:function (value) {
-                var params={
-                    account:value
-                };
-                return $http.get(api.user.CHECK,{params:params});
-            },
-            toJson:function () {
-                return {
-                    account:this.account,
-                    nickName:this.nickName,
-                    password:this.password
-                }
-            }
+        BaiduWeather.prototype = {
+          /**
+           * 判断请求是否成功
+           * @method _isReqSuccess
+           * @param  {String}      msg [description]
+           * @return {Boolean}         [description]
+           * @private
+           */
+          _isReqSuccess:function (msg) {
+            return msg === 'success';
+          },
+          /**
+           * 共用请求
+           * @param {String} url 请求地址
+           * @param {Object} param 请求参数
+           * @returns {*|d.promise|promise}
+           * @private
+           */
+          _request:function(url,param){
+            var deferred = $q.defer();
+            var that = this;
+
+            $http({
+              url:url,
+              method:'GET',
+              params:param,
+              headers:{
+                apiKey:this.API_KEY
+              }
+            })
+            .success(function (resp) {
+              if (that._isReqSuccess(resp.errMsg)){
+                return deferred.resolve(resp.retData);
+              }
+              deferred.reject(resp);
+            })
+            .error(function (err) {
+              deferred.reject(err);
+            });
+
+            return deferred.promise;
+          },
+          /**
+           * 获取城市列表
+           * @method getCityListByName
+           * @param  {String}          cityName 城市名称
+           * @return {[type]}                   [description]
+           */
+          getCityListByName:function (cityName) {
+            return this._request(cityListUri, {
+                  cityname:cityName
+                });
+          },
+          /**
+           * 获取最近天气，过去七天与未来四天
+           * @method getRencentWeatherByCityId
+           * @param  {String}                  cityId 城市Id
+           * @return {Promise}                         [description]
+           */
+          getRecentWeatherByCityId:function (cityId) {
+            return this._request(recentWeatherUri,{
+              cityid:cityId
+            });
+          },
+          /**
+           * 获取今天的天气
+           * @param cityId
+           * @returns {*|d.promise|promise}
+             */
+          getTodayWeatherByCityId:function(cityId){
+            return this._request(todayWeatherUri,{
+              cityid:cityId
+            });
+          }
         };
-    }
+        return BaiduWeather;
+      });
+})();
+
+(function() {
+
+  angular
+    .module('app.user', [
+      'app.config'
+    ])
+    .factory('user', userService);
+
+  function userService($http, api) {
+    var currentUser = null;
+    return {
+      signup: function() {
+        return $http.post(api.user.SIGN_UP, this.toJson());
+      },
+      signin: function() {
+        return $http.post(api.user.SIGN_IN, this.toJson());
+      },
+      unique: function(value) {
+        var params = {
+          account: value
+        };
+        return $http.get(api.user.UNIQUE, {
+          params: params
+        });
+      },
+      toJson: function() {
+        return {
+          account: this.account,
+          nickName: this.nickName,
+          password: this.password
+        };
+      },
+      currentUser: function(user) {
+        if (user) {
+          currentUser = user;
+        } else {
+          return currentUser;
+        }
+      }
+    };
+  }
 })();
 
 angular
@@ -493,49 +608,48 @@ angular
         // body...
     });
 
-(function () {
-    angular
-    .module('app.register',[
-        'app.core',
-        'app.config',
-        'app.user',
-        'ngMessages'
+(function() {
+  angular
+    .module('app.register', [
+      'app.core',
+      'app.config',
+      'app.user',
+      'ngMessages'
     ])
-    .controller('RegisterStep1Controller',function ($scope,$state) {
-        $scope.nextStep=nextStep;
+    .controller('RegisterStep1Controller', function($scope, $state, $mdToast) {
+      $scope.nextStep = nextStep;
 
-        function nextStep(user) {
-            $state.go('step2',{userId:user._id});
-        }
+      function nextStep(user) {
+        $mdToast.showSimple('注册成功');
+        $state.go('step2', {
+          userId: user._id
+        });
+      }
     })
-    .controller('RegisterStep2Controller',function ($scope,$stateParams,$state) {
-        $scope.vm={
-            userId:$stateParams.userId
-        };
-
-        if(!$scope.vm.userId){
-            $state.go('step1');
-        }
+    .controller('RegisterStep2Controller', function($scope, $stateParams,
+      $state) {
+      var uid = $stateParams.userId;
+      if (!uid) {
+        return $state.go('step1');
+      }
+      $scope.vm = {
+        userId: uid
+      };
     })
-    .config(function ($stateProvider,$urlRouterProvider) {
-        $stateProvider
-            .state('step1',{
-                url:'/step1',
-                template:'<div flex="30" class="md-whiteframe-1dp mdl-mg-2x mdl-pd-2x">'+
-                            '<register-form form-title="{{ \'REGISTER\'|translate }}" on-success="nextStep(user)">'+
-                            '</register-form>'+
-                        '</div>',
-                controller:'RegisterStep1Controller'
-            })
-            .state('step2',{
-                url:'/step2/:userId',
-                template:'<div flex="30" class="md-whiteframe-1dp mdl-mg-2x mdl-pd-2x">'+
-                            '<h2>注册成功，请前往你的邮箱激活帐号！</h2>'+
-                        '</div>',
-                controller:'RegisterStep2Controller'
-            });
+    .config(function($stateProvider, $urlRouterProvider) {
+      $stateProvider
+        .state('step1', {
+          url: '/step1',
+          template: '<register-form form-title="用户注册" on-success="nextStep(user)"></register-form>',
+          controller: 'RegisterStep1Controller'
+        })
+        .state('step2', {
+          url: '/step2/:userId',
+          template: '<h2>注册成功，请前往你的邮箱激活帐号！</h2>',
+          controller: 'RegisterStep2Controller'
+        });
 
-            $urlRouterProvider.otherwise('/step1');
+      $urlRouterProvider.otherwise('/step1');
     });
 
 })();
