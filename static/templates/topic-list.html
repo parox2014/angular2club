@@ -1,0 +1,21 @@
+<md-list>
+    <md-list-item ng-repeat="topic in topics" class="md-2-line">
+        <img ng-src="{{ topic.creator.profile.avatar?topic.creator.profile.avatar:'./images/default-avatar.jpg' }}" class="md-avatar" alt="avatar" />
+        <div class="md-list-item-text">
+            <h3>
+                <a href="#" title="{{ topic.title }}">{{ topic.title }}</a>
+            </h3>
+            <p>
+                <md-icon class="material-icons">thumb_up</md-icon>
+                <span>{{ topic.meta.votes }}</span>
+
+                <md-icon class="material-icons">favorite</md-icon>
+                <span>{{ topic.meta.favs }}</span>
+
+                <md-icon class="material-icons">access_time</md-icon>
+                <span>{{ topic.updatedAt|date:'yyyy年M月d日 hh:mm' }}</span>
+            </p>
+        </div>
+        <md-divider></md-divider>
+    </md-list-item>
+</md-list>

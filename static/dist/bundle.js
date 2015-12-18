@@ -12,6 +12,11 @@
         SIGN_IN: '/signin',
         SIGN_OUT: '/signout',
         UNIQUE: '/users/unique'
+      },
+      topic:{
+        BASE:'/topics',
+        GOOD:'/:id/good',
+        VOTE:'/:id/vote'
       }
     };
   }
@@ -78,12 +83,26 @@
     ]);
 })();
 
+(function(){
+  "use strict";
+  angular
+    .module('app.filters',[])
+    .filter('')
+})();
 (function () {
     angular.module('app.routes',[])
     .config(routeConfig);
 
-    function routeConfig($stateProvider) {
-        // body...
+    function routeConfig($stateProvider,$urlRouterProvider) {
+        $stateProvider
+        .state('main',{
+            url:'/',
+            template:`
+                <topic-list></topic-list>
+                `
+        });
+
+        $urlRouterProvider.otherwise('/');
     }
 })();
 
@@ -103,24 +122,24 @@ angular.module('app.starter',[
           baiduWeather
             .getCityListByName('杭州')
             .then(function (resp) {
-              cityId=resp[0].area_id;
+              cityId = resp[0].area_id;
               return baiduWeather.getRecentWeatherByCityId(cityId);
             })
-            .then(function(data){
+            .then(function(data) {
               console.log('recent',data);
               return baiduWeather.getTodayWeatherByCityId(cityId);
             })
-            .then(function(data){
+            .then(function(data) {
               console.log('today',data);
             })
-            .catch(function(err){
+            .catch(function(err) {
               console.error(err);
             });
 
         };
       })
       .run(function (user) {
-        user.currentUser(window.__currentUser)
+        user.currentUser(window.__currentUser);
       });
 
 (function() {
@@ -183,7 +202,7 @@ angular.module('app.starter',[
 })(window.angular);
 
 angular.module('app.component')
-.directive('loginForm',function (user) {
+.directive('loginForm',function (user,$rootScope) {
     return {
         restrict:'EA',
         scope:{
@@ -212,6 +231,11 @@ angular.module('app.component')
                     $scope.onError({ error:err });
                     viewModel.isSubmiting = false;
                 });
+            };
+
+            $scope.onClick=function(e){
+                "use strict";
+                $rootScope.$broadcast('$requestStart',e);
             };
         }
     };
@@ -276,6 +300,39 @@ angular.module('app.component')
   }
 })();
 
+(function(){
+  "use strict";
+  angular
+    .module('app.component')
+    .directive('topicList',topicListDirective);
+
+  function TopicListController($scope,$attrs,$element,Topic){
+    var that=this;
+
+    that.init=init;
+    that.getList=getList;
+
+    function init(){
+      $scope.topics=this.getList();
+    }
+
+    function getList(params){
+      return Topic.query(params);
+    }
+  }
+
+  function topicListDirective(){
+    return {
+      restrict:'EA',
+      templateUrl:'../templates/topic-list.html',
+      replace:true,
+      controller:TopicListController,
+      link:function(scope,element,attrs,topicCtrl){
+        topicCtrl.init();
+      }
+    }
+  }
+})();
 (function() {
   var directives = angular.module('app.directives', []);
 
@@ -328,7 +385,7 @@ angular.module('app.component')
           text: 'English',
           value: 'en',
           isChecked: false
-        }, ];
+        } ];
 
         scope.openMenu = function($mdOpenMenu, ev) {
           $mdOpenMenu(ev);
@@ -364,7 +421,7 @@ angular.module('app.component')
 })();
 
 (function (angular) {
-    angular.module('app.services', ['ngMaterial'])
+    angular.module('app.services', ['ngMaterial','app.config'])
         .factory('$dialog', function($mdDialog,$filter) {
             var translateFilter=$filter('translate');
             return {
@@ -538,6 +595,16 @@ angular.module('app.component')
       });
 })();
 
+(function(){
+  "use strict";
+  angular
+    .module('app.services')
+    .factory('Topic',function($resource,api){
+      var Topic=$resource(api.topic.BASE);
+
+      return Topic;
+    });
+})();
 (function() {
 
   angular

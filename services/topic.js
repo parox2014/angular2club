@@ -84,7 +84,7 @@ class TopicService{
         .limit(limit)
         .skip(skip)
         .populate('creator', 'profile.nickName profile.avatar')
-        .select('title type createdAt creator meta favers')
+        .select('title type createdAt updatedAt creator meta favers')
         .exec((err,docs)=>{
           if (err) {
             callback(err);

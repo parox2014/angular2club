@@ -14,22 +14,22 @@ angular.module('app.starter',[
           baiduWeather
             .getCityListByName('杭州')
             .then(function (resp) {
-              cityId=resp[0].area_id;
+              cityId = resp[0].area_id;
               return baiduWeather.getRecentWeatherByCityId(cityId);
             })
-            .then(function(data){
+            .then(function(data) {
               console.log('recent',data);
               return baiduWeather.getTodayWeatherByCityId(cityId);
             })
-            .then(function(data){
+            .then(function(data) {
               console.log('today',data);
             })
-            .catch(function(err){
+            .catch(function(err) {
               console.error(err);
             });
 
         };
       })
       .run(function (user) {
-        user.currentUser(window.__currentUser)
+        user.currentUser(window.__currentUser);
       });

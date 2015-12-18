@@ -1,5 +1,5 @@
 angular.module('app.component')
-.directive('loginForm',function (user) {
+.directive('loginForm',function (user,$rootScope) {
     return {
         restrict:'EA',
         scope:{
@@ -28,6 +28,11 @@ angular.module('app.component')
                     $scope.onError({ error:err });
                     viewModel.isSubmiting = false;
                 });
+            };
+
+            $scope.onClick=function(e){
+                "use strict";
+                $rootScope.$broadcast('$requestStart',e);
             };
         }
     };

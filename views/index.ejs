@@ -1,36 +1,17 @@
 <%include ./common/header.ejs%>
 <body layout="column" layout-align="right bottom" ng-controller="MainController">
   <common-toolbar show-menu-button="true"></common-toolbar>
-   <md-content layout="row" layout-align="center" flex>
-       <left-menu></left-menu>
-       <div flex="70" class="md-whiteframe-2dp mdl-mg-2x">
-          <md-list>
-            <md-list-item>
-              <img ng-src="" class="md-avatar" alt="topic" />
-              <div class="md-list-item-text">
-                 this is an topic
-              </div>
-            </md-list-item>
-            <md-list-item>
-              <img ng-src="" class="md-avatar" alt="topic" />
-              <div class="md-list-item-text">
-                 this is an topic
-              </div>
-            </md-list-item>
-            <md-list-item>
-              <img ng-src="" class="md-avatar" alt="topic" />
-              <div class="md-list-item-text">
-                 this is an topic
-              </div>
-            </md-list-item>
-          </md-list>
-         <p style="text-align: center;">网站正在开发中，敬请期待......</p>
-         <p style="text-align: center;font-family: 'Microsoft Yahei';">github项目地址：<a href="https://github.com/WilliamDu1981/angular2club">https://github.com/WilliamDu1981/angular2club</a> </p>
-         <p style="text-align: center;font-family: 'Microsoft Yahei';">qq群:<a href="http://jq.qq.com/?_wv=1027&k=fkBdwB">461460156</a> ,欢迎志趣相投的朋友加入！</p>
+   <md-content layout="row" flex style="background: #eeeeee;">
+       <left-menu style="background: transparent;"></left-menu>
+       <div class="md-whiteframe-2dp mdl-mg-1x" flex="layout-md" flex-md="65" ui-view style="background:#fff;">
+
+
        </div>
    </md-content>
    <main-menu></main-menu>
-
+<!--  <p style="text-align: center;">网站正在开发中，敬请期待......</p>
+  <p style="text-align: center;font-family: 'Microsoft Yahei';">github项目地址：<a href="https://github.com/WilliamDu1981/angular2club">https://github.com/WilliamDu1981/angular2club</a> </p>
+  <p style="text-align: center;font-family: 'Microsoft Yahei';">qq群:<a href="http://jq.qq.com/?_wv=1027&k=fkBdwB">461460156</a> ,欢迎志趣相投的朋友加入！</p>-->
 <%include ./common/scripts.ejs%>
 
 <script>
@@ -52,16 +33,6 @@
       angular.bootstrap(document,['app.starter']);
     });
 
-    /*var s=document.createElement('script');
-
-    s.type='text/javascript';
-    s.sync=true;
-    s.src='/jsonp?callback=cb';
-    document.body.appendChild(s);
-
-    function cb(data) {
-      console.log(data)
-    }*/
 </script>
 </body>
 <%include ./common/footer.ejs%>

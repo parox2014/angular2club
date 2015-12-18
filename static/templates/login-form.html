@@ -35,13 +35,13 @@
           <md-button href="/signup">还没有帐号？注册</md-button>
         </md-menu-item>
         <md-menu-item>
-          <md-button href="{{vm.qqUri}}">
+          <md-button href="{{vm.qqUri}}" ng-click="onClick($event)">
             QQ登录
           </md-button>
         </md-menu-item>
 
         <md-menu-item>
-          <md-button href="{{vm.gitHubUri}}">github登录</md-button>
+          <md-button href="{{vm.gitHubUri}}" ng-click="onClick($event)">github登录</md-button>
         </md-menu-item>
     </md-input-container>
 

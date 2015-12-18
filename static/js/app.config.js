@@ -12,6 +12,11 @@
         SIGN_IN: '/signin',
         SIGN_OUT: '/signout',
         UNIQUE: '/users/unique'
+      },
+      topic:{
+        BASE:'/topics',
+        GOOD:'/:id/good',
+        VOTE:'/:id/vote'
       }
     };
   }

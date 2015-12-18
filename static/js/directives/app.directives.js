@@ -50,7 +50,7 @@
           text: 'English',
           value: 'en',
           isChecked: false
-        }, ];
+        } ];
 
         scope.openMenu = function($mdOpenMenu, ev) {
           $mdOpenMenu(ev);

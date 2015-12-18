@@ -1,6 +1,6 @@
-<md-sidenav md-component-id="leftMenu" class="md-sidenav-left md-whiteframe-2dp">
+<md-sidenav md-component-id="leftMenu" class="md-sidenav-left" md-is-locked-open="$mdMedia('gt-md')">
 
-    <md-menu-content>
+    <md-menu-content style="background: transparent;">
         <md-menu-item>
             <md-button href="#">
                 <md-icon class="material-icons">select_all</md-icon>
@@ -20,14 +20,20 @@
             </md-button>
         </md-menu-item>
         <md-menu-item>
-            <md-button href="/signout">
+            <md-button href="#question">
                 <md-icon class="material-icons">question_answer</md-icon>
                 问答
             </md-button>
         </md-menu-item>
+        <md-menu-item>
+            <md-button href="#/zhaopin">
+                <md-icon class="material-icons">work</md-icon>
+                招聘
+            </md-button>
+        </md-menu-item>
     </md-menu-content>
     <hr>
-    <md-menu-content>
+    <md-menu-content style="background: transparent;">
       <md-menu-item>
         <md-button>
           <md-icon class="material-icons">add_circle</md-icon>

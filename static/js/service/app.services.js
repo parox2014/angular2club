@@ -1,5 +1,5 @@
 (function (angular) {
-    angular.module('app.services', ['ngMaterial'])
+    angular.module('app.services', ['ngMaterial','app.config'])
         .factory('$dialog', function($mdDialog,$filter) {
             var translateFilter=$filter('translate');
             return {
