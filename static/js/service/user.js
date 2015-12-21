@@ -1,9 +1,7 @@
 (function() {
 
   angular
-    .module('app.user', [
-      'app.config'
-    ])
+    .module('app.services')
     .factory('user', userService);
 
   function userService($http, api) {

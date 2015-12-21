@@ -3,7 +3,6 @@
     .module('app.register', [
       'app.core',
       'app.config',
-      'app.user',
       'ngMessages'
     ])
     .controller('RegisterStep1Controller', function($scope, $state, $mdToast) {

@@ -90,19 +90,103 @@
     .filter('')
 })();
 (function () {
-    angular.module('app.routes',[])
+    angular.module('app.routes',['app.topic'])
     .config(routeConfig);
 
     function routeConfig($stateProvider,$urlRouterProvider) {
         $stateProvider
-        .state('main',{
-            url:'/',
+        .state('topicList',{
+            url:'/topics?type&limit&skip&isGood',
             template:`
-                <topic-list></topic-list>
-                `
+                <topic-list option="vm"></topic-list>
+                `,
+            controller:'TopicController'
+        })
+        .state('topicDetail',{
+            url:'/topics/:topicId',
+            template:`
+                <div>
+                    <h2>{{ topic.title }}</h2>
+                    <p>{{ topic.content }}</p>
+                    <button ng-click="vote()">赞</button>
+                <div>
+            `,
+            controller:function($scope,Topic,$stateParams,user){
+                "use strict";
+
+                var topic=new Topic({_id:$stateParams.topicId});
+                var sessionUser=user.currentUser();
+                $scope.topic=topic;
+
+                topic.$get();
+
+                $scope.vote=function(){
+                    topic.toggleVote(sessionUser?sessionUser._id:null)
+                        .then(function(resp){
+                            console.log(resp);
+                        });
+                };
+            }
+        })
+        .state('topicCreate',{
+            url:'/topics/create/new',
+            template:`
+                <form name="topicForm" ng-submit="createTopic($event)">
+
+                        <md-input-container md-no-float class="md-block">
+                            <input ng-model="topic.title"
+                                name="title"
+                                type="text"
+                                placeholder="标题"
+                                aria-label="标题"
+                                required>
+                        </md-input-container>
+
+                        <md-input-container md-no-float class="md-block">
+                            <input ng-model="topic.type"
+                                name="type"
+                                type="text"
+                                placeholder="类型"
+                                aria-label="类型"
+                                required>
+                        </md-input-container>
+
+                        <md-input-container md-no-float class="md-block">
+                            <textarea ng-model="topic.content"
+                                name="content"
+                                placeholder="内容"
+                                aria-label="内容"
+                                required>
+                                </textarea>
+                        </md-input-container>
+
+                        <md-input-container md-no-float class="md-block">
+                            <md-button type="submit" flex="100"
+                                class="md-primary md-raised">
+                                保存
+                            </md-button>
+                        </md-input-container>
+                    </form>
+            `,
+            controller:function($scope,Topic,$dialog,$state){
+                "use strict";
+                $scope.topic=new Topic();
+
+                $scope.createTopic=function(){
+                    $scope.topic.$save()
+                        .then(function(){
+                            $dialog.alert('创建文章成功!');
+                            $state.go('topicList');
+                        },function(err){
+                            $dialog.alert('需要登录才能发贴',function(){
+                                window.href='/signin'
+                            });
+                        });
+                }
+            }
         });
 
-        $urlRouterProvider.otherwise('/');
+        $urlRouterProvider.otherwise('/topics?type=1');
     }
 })();
 
@@ -111,7 +195,6 @@ angular.module('app.starter',[
         'app.core',
         'app.config',
         'app.routes',
-        'app.user',
         'app.baiduWeather'
       ])
       .controller('MainController',function ($scope,BaiduWeather,baiduWeatherApiKey) {
@@ -143,8 +226,95 @@ angular.module('app.starter',[
       });
 
 (function() {
+  var directives = angular.module('app.directives', []);
+
+  directives.directive('unique', uniqueDirecitve);
+
+  function uniqueDirecitve($parse, user) {
+    return {
+      require: '?^ngModel',
+      link: function(scope, element, attr, ngModel) {
+        var isUnique = false;
+        var getNgModel = $parse(attr.ngModel);
+
+        element.bind('blur', function() {
+          var value = getNgModel(scope);
+
+          if (isUnique || !value) {
+            return;
+          }
+
+          user.unique(value)
+            .success(function(resp) {
+              console.log(resp);
+              ngModel.$setValidity('unique', true);
+              isUnique = true;
+            })
+            .error(function(err) {
+              console.log(err);
+              ngModel.$setValidity('unique', false);
+              isUnique = true;
+            });
+        });
+
+        element.bind('input', function() {
+          isUnique = false;
+        });
+      }
+    };
+  }
+
+  directives.directive('languageMenu', languageMenuDirective);
+
+  function languageMenuDirective($translate) {
+    return {
+      link: function(scope, element) {
+        var langs = [{
+          text: '中文',
+          value: 'zh_CN',
+          isChecked: true
+        }, {
+          text: 'English',
+          value: 'en',
+          isChecked: false
+        } ];
+
+        scope.openMenu = function($mdOpenMenu, ev) {
+          $mdOpenMenu(ev);
+        };
+
+        scope.changeLang = function(lang) {
+          $translate.use(lang.value);
+          angular.forEach(langs, function(item) {
+            item.isChecked = false;
+          });
+
+          lang.isChecked = true;
+        };
+
+        scope.langs = langs;
+      }
+    };
+  }
+
+  directives.directive('mdAvatar', avatarDirective);
+
+  function avatarDirective() {
+    return {
+      restrict: 'EA',
+      replace: true,
+      templateUrl: '../templates/avatar.html',
+      scope: {
+        profile: '='
+      }
+    };
+  }
+
+})();
+
+(function() {
   angular
-    .module('app.component', ['app.user', 'ngMessages'])
+    .module('app.component', ['app.services', 'ngMessages'])
     .directive('commonToolbar', function($mdSidenav, user, $timeout) {
       return {
         templateUrl: '../templates/common-toolbar.html',
@@ -306,14 +476,15 @@ angular.module('app.component')
     .module('app.component')
     .directive('topicList',topicListDirective);
 
-  function TopicListController($scope,$attrs,$element,Topic){
+  function TopicListController($scope,$attrs,$element,Topic,$parse){
     var that=this;
+    var params=$parse($attrs.option)($scope);
 
     that.init=init;
     that.getList=getList;
 
     function init(){
-      $scope.topics=this.getList();
+      $scope.topics=this.getList(params);
     }
 
     function getList(params){
@@ -333,93 +504,6 @@ angular.module('app.component')
     }
   }
 })();
-(function() {
-  var directives = angular.module('app.directives', []);
-
-  directives.directive('unique', uniqueDirecitve);
-
-  function uniqueDirecitve($parse, user) {
-    return {
-      require: '?^ngModel',
-      link: function(scope, element, attr, ngModel) {
-        var isUnique = false;
-        var getNgModel = $parse(attr.ngModel);
-
-        element.bind('blur', function() {
-          var value = getNgModel(scope);
-
-          if (isUnique || !value) {
-            return;
-          }
-
-          user.unique(value)
-            .success(function(resp) {
-              console.log(resp);
-              ngModel.$setValidity('unique', true);
-              isUnique = true;
-            })
-            .error(function(err) {
-              console.log(err);
-              ngModel.$setValidity('unique', false);
-              isUnique = true;
-            });
-        });
-
-        element.bind('input', function() {
-          isUnique = false;
-        });
-      }
-    };
-  }
-
-  directives.directive('languageMenu', languageMenuDirective);
-
-  function languageMenuDirective($translate) {
-    return {
-      link: function(scope, element) {
-        var langs = [{
-          text: '中文',
-          value: 'zh_CN',
-          isChecked: true
-        }, {
-          text: 'English',
-          value: 'en',
-          isChecked: false
-        } ];
-
-        scope.openMenu = function($mdOpenMenu, ev) {
-          $mdOpenMenu(ev);
-        };
-
-        scope.changeLang = function(lang) {
-          $translate.use(lang.value);
-          angular.forEach(langs, function(item) {
-            item.isChecked = false;
-          });
-
-          lang.isChecked = true;
-        };
-
-        scope.langs = langs;
-      }
-    };
-  }
-
-  directives.directive('mdAvatar', avatarDirective);
-
-  function avatarDirective() {
-    return {
-      restrict: 'EA',
-      replace: true,
-      templateUrl: '../templates/avatar.html',
-      scope: {
-        profile: '='
-      }
-    };
-  }
-
-})();
-
 (function (angular) {
     angular.module('app.services', ['ngMaterial','app.config'])
         .factory('$dialog', function($mdDialog,$filter) {
@@ -599,18 +683,44 @@ angular.module('app.component')
   "use strict";
   angular
     .module('app.services')
-    .factory('Topic',function($resource,api){
-      var Topic=$resource(api.topic.BASE);
+    .factory('Topic',function($resource,api,$http,$q){
+      var Topic=$resource(api.topic.BASE+'/:id',{
+        id:'@_id'
+      });
+
+
+      Topic.prototype.toggleGood=toggleGood;
+      Topic.prototype.toggleVote=toggleVote;
 
       return Topic;
+
+      function toggleGood(){
+        this.isGood=!this.isGood;
+      }
+
+      function toggleVote(cuid){
+        var deffered=$q.defer();
+        var uri=(api.topic.BASE+api.topic.VOTE).replace(':id',this._id);
+        var vote=this.voters.indexOf(cuid)>-1?-1:1;
+        var self=this;
+        uri+='?vote='+vote;
+
+        $http.put(uri)
+            .then(function(resp){
+              angular.extend(self,resp.data);
+              deffered.resolve(resp);
+            },function(err){
+              deffered.reject(err);
+            });
+
+        return deffered.promise;
+      }
     });
 })();
 (function() {
 
   angular
-    .module('app.user', [
-      'app.config'
-    ])
+    .module('app.services')
     .factory('user', userService);
 
   function userService($http, api) {
@@ -651,8 +761,7 @@ angular.module('app.component')
 angular
     .module('app.login',[
         'app.core',
-        'app.config',
-        'app.user'
+        'app.config'
     ])
     .controller('LoginController',function ($scope,$timeout,$dialog,$filter,$mdToast) {
         $scope.onSuccess=function (user) {
@@ -680,7 +789,6 @@ angular
     .module('app.register', [
       'app.core',
       'app.config',
-      'app.user',
       'ngMessages'
     ])
     .controller('RegisterStep1Controller', function($scope, $state, $mdToast) {
@@ -720,3 +828,11 @@ angular
     });
 
 })();
+
+(function(ng){
+  "use strict";
+  ng.module('app.topic',['app.core'])
+    .controller('TopicController',function($scope,$stateParams){
+      $scope.vm=$stateParams;
+    });
+})(window.angular);

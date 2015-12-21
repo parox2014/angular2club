@@ -1,6 +1,6 @@
 (function() {
   angular
-    .module('app.component', ['app.user', 'ngMessages'])
+    .module('app.component', ['app.services', 'ngMessages'])
     .directive('commonToolbar', function($mdSidenav, user, $timeout) {
       return {
         templateUrl: '../templates/common-toolbar.html',

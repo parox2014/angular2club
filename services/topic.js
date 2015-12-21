@@ -75,6 +75,16 @@ class TopicService{
 
     callback = callback || noop;
 
+    if(query.type){
+      query.type=Number(query.type);
+    }
+
+    if(query.type===0){
+      delete query.type;
+    }
+
+    query.isGood=query.isGood==='true';
+
     query.deleted = false;
 
     return new Promise(function(resolve, reject) {
@@ -83,6 +93,7 @@ class TopicService{
         .where(query)
         .limit(limit)
         .skip(skip)
+        .sort('lastCommentAt')
         .populate('creator', 'profile.nickName profile.avatar')
         .select('title type createdAt updatedAt creator meta favers')
         .exec((err,docs)=>{

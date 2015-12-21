@@ -1,8 +1,7 @@
 angular
     .module('app.login',[
         'app.core',
-        'app.config',
-        'app.user'
+        'app.config'
     ])
     .controller('LoginController',function ($scope,$timeout,$dialog,$filter,$mdToast) {
         $scope.onSuccess=function (user) {

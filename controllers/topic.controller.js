@@ -41,7 +41,7 @@ exports.getTopicList = function(req, res) {
   var query = Object.create(req.query);
   var limit = query.limit || 20;
   var skip = query.start || '0';
-
+  logger.debug(req.query);
   delete query.limit;
   delete query.start;
 

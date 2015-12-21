@@ -3,7 +3,7 @@
         <img ng-src="{{ topic.creator.profile.avatar?topic.creator.profile.avatar:'./images/default-avatar.jpg' }}" class="md-avatar" alt="avatar" />
         <div class="md-list-item-text">
             <h3>
-                <a href="#" title="{{ topic.title }}">{{ topic.title }}</a>
+                <a ui-sref="topicDetail({topicId:topic._id })" title="{{ topic.title }}">{{ topic.title }}</a>
             </h3>
             <p>
                 <md-icon class="material-icons">thumb_up</md-icon>

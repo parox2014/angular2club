@@ -4,14 +4,15 @@
     .module('app.component')
     .directive('topicList',topicListDirective);
 
-  function TopicListController($scope,$attrs,$element,Topic){
+  function TopicListController($scope,$attrs,$element,Topic,$parse){
     var that=this;
+    var params=$parse($attrs.option)($scope);
 
     that.init=init;
     that.getList=getList;
 
     function init(){
-      $scope.topics=this.getList();
+      $scope.topics=this.getList(params);
     }
 
     function getList(params){
